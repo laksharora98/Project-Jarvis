@@ -1,0 +1,145 @@
+select  distinct tp.*, tbl5.crse_id_ext as original_course_id , cccd.course_title as original_course_title from
+(select stu_con.*
+,concat(stu_con.created_by,' (',up.first_name,' ' ,up.last_name,' )') as Transaction_by_name 
+  from
+(select distinct mis.*,
+ CASE
+        WHEN mm.serial_number_profile = '0005' THEN 'Bar-Coded'
+        ELSE 'Non Bar-Coded'
+    END AS Material_type,
+case when substring(mis.material_number,1,1)='9' then 'Starting with 9' else 'Not Starting with 9' end materialnumberstartwith9,
+b.primary_batch,
+c.secondary_batch,
+case when mis.emplid  is not null then 1 else 0 end as eligible_student,
+d.course_title,n.course_start_date,
+n.course_end_date,
+ca.crse_attr_value,
+e.registration_date,
+-- e.academic_group_value as Strm,
+e.student_name as student_name_std_app_dtl ,
+f.business_area_desc,
+coalesce(rm.region_disp_val,'NA') region_disp_val,
+coalesce(butm.business_unit_type_disp_val,'NA') branch_type
+ from (
+SELECT distinct  dtl3.business_unit,
+  dtl3.EMPLID,
+  dtl3.CRSE_ID,
+--   D.COURSE_TITLE_LONG,
+  dtl3.STRM,
+  dtl3.ADM_APPL_NBR,
+  dtl3.ITEM_TYPE,
+  dtl3.RECEIPT_DT,
+  dtl3.AES_PAYMENT_METHOD,
+  dtl3.DESCR1 receipt_id,
+  -- dtl3.AES_TRANSACTION_ID,
+
+-- mat_map.material_number as material_number_proposed,
+-- mat_map.material_description as material_description_proposed,
+
+offr.acad_group,
+
+  aud.TRANSACTION_ID,
+  aud.material_number,
+aud.material_description,
+aud.primary_batch_id,
+aud.secondary_batch_id,
+aud.type,
+aud.plant_id,
+aud.status,
+aud.reason,
+aud.is_deleted,
+aud.return_transaction_id,
+aud.student_name,
+aud.return_mode,
+aud.receipt_id Stock_receipt_id,
+aud.psid,
+aud.application_id,
+aud.business_area, 
+-------
+aud.program_action,
+aud.term_value,
+aud.barcode,
+-- material_type,
+-- Material Qty,
+aud.sap_doc_id,
+aud.academic_career_value,
+"date_add"('minute', 330,aud.issue_date) issue_date,
+aud.created_by,
+aud.updated_by,
+"date_add"('minute', 330,aud.created_on) created_on ,
+"date_add"('minute', 330,aud.updated_on) updated_on
+FROM 
+----
+ (select * from  "intern_hands_on".PS_AES_STDNT_DTL3 where RECEIPT_DT >= cast('2023-04-01' as timestamp)
+-- substring(strm,3,2)>'24'
+ --and  crse_id in ('300005','300070','300015','300004','300006')
+) dtl3 
+-----
+ inner join (select distinct id,course_id  
+ from "phoenix-enrollment_service".miscellaneous_course_mapping where is_deleted=0 ) mapp
+ on cast(mapp.course_id as varchar(50))=cast(dtl3.crse_id as varchar(50))
+ -----------------------------------------------------------------------------------
+inner join  "phoenix-enrollment_service".miscellaneous_course_material_mapping mat_map
+ on  mat_map.course_mapping_id=mapp.id
+ 
+ inner join "pserp-curriculum-management".ps_crse_offer offr on offr.crse_id=dtl3.crse_id
+ and dtl3.business_unit =concat(substring(offr.campus,4,2),substring(offr.campus,1,3))
+ 
+------------------------------------------------------------------------------
+left join (select * from "phoenix-enrollment_service".stock_transaction_aud where  academic_career_value='RCC' and STATUS = 'SUCCESS'
+ and  type in ('PSID_ISSUANCE','PSID_RETURN') ) aud
+
+ on  dtl3.descr1=aud.receipt_id
+-- on cast(aud.course_id as varchar)=cast(dtl3.crse_id as varchar)
+-- and dtl3.emplid=aud.psid
+-- AND cast(dtl3.STRM as varchar) = cast(aud.term_value as varchar)
+-- and cast(aud.receipt_id as varchar)=cast(dtl3.descr1 as varchar)
+
+) mis
+ ---------------------------------
+left join (select material_id,material_description,serial_number_profile from (select material_id,material_description,serial_number_profile ,row_number() over(partition by material_id order by updated_on desc) rn  from "phoenix-enrollment_service".material_master ) where rn=1)  mm
+on mm.material_id=mis.material_number
+-------------------------------------------------------
+
+left join 
+(select id,batch_name as primary_batch from "phoenix-student_batch_service"."student_batch")b on mis.primary_batch_id=b.id
+left join
+(select id,batch_name as secondary_batch from "phoenix-student_batch_service"."student_batch")c on mis.secondary_batch_id=c.id
+ left join
+(select * from "phoenix-master_setup_service".course_catalog_course_detail) d on cast(mis.CRSE_ID as varchar) =d.course_id
+
+left join 
+(select course_id,academic_term,business_area,course_start_date,
+course_end_date from (select  course_id,academic_term,business_area,course_start_date,
+course_end_date,row_number() over(partition by course_id,academic_term,business_area	
+ order by transaction_id desc) rn from "phoenix_pricing_service".course_fees_processing_approval
+  where course_fee_status='L2Approved') where rn=1)  n 
+ on cast(mis.crse_id  as varchar) =cast(n.course_id  as varchar) and cast(mis.strm as varchar)=cast(n.academic_term as varchar) and mis.business_area=n.business_area
+
+  left join
+(SELECT * FROM "pserp-curriculum-management".PS_CRSE_ATTRIBUTES where CRSE_ATTR='CRCT') ca 
+on cast(mis.crse_id as varchar) =ca.crse_id
+
+left  join (select * from "phoenix-enrollment_service".student_application_details) e on cast(mis.crse_id as varchar)=cast(e.course_id as varchar) and mis.psid=e.psid and cast(mis.application_id as varchar)=cast(e.application_id as varchar)
+left  join (select * from "phoenix-master_setup_service".business_area_master) f on  mis.business_unit=f.business_area_disp_val
+
+left JOIN
+"phoenix-master_setup_service".business_area_region_master barm ON f.id = barm.business_area_id
+    left JOIN
+"phoenix-master_setup_service".business_area_business_unit_type_master babutm ON f.id = babutm.business_area_id
+    left JOIN
+"phoenix-master_setup_service".business_unit_type_master butm ON babutm.business_unit_type_id = butm.ID
+    left JOIN
+"phoenix-master_setup_service".region_master rm ON cast( barm.region_id as varchar(50)) = cast(rm.region_key as varchar(50))
+) stu_con
+left join  "phoenix-authentication_service".user_profile up on up.employee_id=stu_con.created_by
+) tp
+left join "psquery_derived_tables"."ps_aes_stdnt_tbl5"  tbl5 on tbl5.emplid=tp.emplid 
+and tp.CRSE_ID=tbl5.crse_id and tp.STRM=tbl5.year
+
+ left join
+(select * from "phoenix-master_setup_service".course_catalog_course_detail) cccd on cast(tbl5.crse_id_ext as varchar) =cccd.course_id
+
+
+WHERE TRY_CAST(SUBSTRING(tp.STRM, -2) AS INTEGER) >= EXTRACT(YEAR FROM CURRENT_DATE) % 100
+and TRY_CAST(SUBSTRING(tp.STRM, 1,2) AS INTEGER) < ((EXTRACT(YEAR FROM CURRENT_DATE) % 100)+1)

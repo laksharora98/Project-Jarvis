@@ -1,0 +1,68 @@
+select * from (select distinct psid,
+application_id,a.student_name,
+academic_group_value,
+term_value as term,
+class,
+a.course_id,
+d.course_title,
+n.course_start_date as start_date,
+n.course_end_date as end_date,
+ca.crse_attr_value,
+registration_date,
+f.sap_plant_id,
+business_area_value as business_unit,
+f.business_area_desc,
+b.primary_batch,
+c.secondary_batch,
+program_action,
+case when program_action in ('MATR', 'RADM' , 'FOLO','BTCG') then 1 else 0 end active_student,
+case when program_action in ('MATR', 'RADM' ,'BTCG') and (length(trim(coalesce(b.primary_batch,'')))>0 or length(trim(coalesce(c.secondary_batch,'')))>0
+)  then 1 else 0 end eligible_student,
+case when (program_action in ('MATR', 'RADM' ,'BTCG') and (primary_batch='' or  primary_batch=' ' or primary_batch='NULL' or primary_batch='null' or primary_batch is null) and 
+((secondary_batch='' or  secondary_batch=' ' or secondary_batch='NULL' or secondary_batch='null' or secondary_batch is null ))) OR (program_action ='FOLO' )  then 1 else 0 end ineligible_student,
+e.academic_career_disp_val
+,g.aes_last_payment_dt
+
+,coalesce(rm.region_disp_val,'NA') region_disp_val
+,coalesce(butm.business_unit_type_disp_val,'NA') branch_type
+
+from((select * from "phoenix-enrollment_service".student_application_details)a
+left join 
+(select id,batch_name as primary_batch from "phoenix-student_batch_service"."student_batch")b on a.primary_batch_id=b.id
+left join
+(select id,batch_name as secondary_batch from "phoenix-student_batch_service"."student_batch")c on a.secondary_batch_id=c.id
+left join
+(select * from "phoenix-master_setup_service".course_catalog_course_detail)d on cast(a.course_id as varchar) =d.course_id
+
+left join 
+(select course_id,academic_term,business_area,course_start_date,
+course_end_date from (select  course_id,academic_term,business_area,course_start_date,
+course_end_date,row_number() over(partition by course_id,academic_term,business_area	
+ order by transaction_id desc) rn from "phoenix_pricing_service".course_fees_processing_approval
+  where course_fee_status='L2Approved') where rn=1)  n 
+  on a.course_id  =n.course_id and a.term=n.academic_term and a.business_area=n.business_area
+
+left join
+(SELECT * FROM "pserp-curriculum-management".PS_CRSE_ATTRIBUTES where CRSE_ATTR='CRCT') ca on cast(a.course_id as varchar) =ca.crse_id
+
+
+left join
+(select * from "phoenix-master_setup_service".academic_career_master)e on d.academic_career_id=cast(e.academic_career_key as int)
+left join
+(select * from "phoenix-master_setup_service".business_area_master)f on a.business_area=f.id
+
+   left JOIN
+    "phoenix-master_setup_service".business_area_region_master barm ON f.id = barm.business_area_id
+        left JOIN
+ "phoenix-master_setup_service".business_area_business_unit_type_master babutm ON f.id = babutm.business_area_id
+        left JOIN
+    "phoenix-master_setup_service".business_unit_type_master butm ON babutm.business_unit_type_id = butm.ID
+        left JOIN
+    "phoenix-master_setup_service".region_master rm ON cast( barm.region_id as varchar(50)) = cast(rm.region_key as varchar(50))
+
+left join
+(select distinct emplid,adm_appl_nbr, crse_id ,business_unit ,strm,aes_last_payment_dt from csprod.ps_aes_studentoneview )g on a.psid=g.emplid  
+and g.adm_appl_nbr=a.application_id and  cast(a.course_id as varchar)=g.crse_id and a.business_area_value=g.business_unit and a.term_value=g.strm
+)) where academic_career_disp_val='RCC' 
+and CAST(SUBSTRING(term, -2) AS INTEGER) >= EXTRACT(YEAR FROM CURRENT_DATE) % 100
+and CAST(SUBSTRING(term, 1,2) AS INTEGER) < ((EXTRACT(YEAR FROM CURRENT_DATE) % 100) + 1)

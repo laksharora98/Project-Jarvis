@@ -1,0 +1,106 @@
+select *				 from (
+select *,
+-- case when transaction_id is null then 'Not Issued' else 'Issued' end is_issued  
+case when transaction_id is not null and upper(status)='SUCCESS' and return_transaction_id is null then 'Issued' else 'Not Issued' end is_issued
+from ( select distinct  tp.student_name,tp.psid,tp.application_id,tp.business_area_value as business_unit,
+tp.term_value,tp.course_id,tp.program_action,tp.region_disp_val region ,
+--tp.primary_batch_id,tp.secondary_batch_id,
+tp.primary_batch,
+tp.secondary_batch,
+tp.course_attribute_disp_val,
+tp.course_attribute_desc,
+tp.course_attribute_value_disp_val,
+tp.course_attribute_value_desc,
+tp.material as material_number, tp.material_description ,
+audTable.return_transaction_id,
+audTable.sap_doc_id,
+audTable.status,
+audTable.transaction_id,
+audTable.issue_date,
+audTable. barcode,
+n.course_start_date,
+n.course_end_date
+
+from
+ (select  * from (
+ select  distinct
+sad.student_name,
+sad.psid,
+sad.application_id,
+sad.business_area,
+sad.business_area_value,
+sad.term_value,
+sad.course_id,
+sad.academic_career_value,
+sad.academic_group_value,
+sad.registration_date,
+sad.program_action,
+sad.class,
+sad.primary_batch_id,
+sad.secondary_batch_id,
+b.primary_batch,
+c.secondary_batch,
+cam.course_attribute_disp_val,
+cam.course_attribute_desc,
+cavm.course_attribute_value_disp_val,
+cavm.course_attribute_value_desc,
+mm.material_id material,
+mm.material_description,rm.region_disp_val
+
+FROM  (select * from  "phoenix-enrollment_service".student_application_details where is_deleted =false ) sad
+left join 
+(select id,batch_name as primary_batch from "phoenix-student_batch_service"."student_batch")b on sad.primary_batch_id=b.id
+left join
+(select id,batch_name as secondary_batch from "phoenix-student_batch_service"."student_batch")c on sad.secondary_batch_id=c.id
+inner join (select * from "phoenix-master_setup_service"."associated_attribute" where is_deleted=0 ) aa
+on cast(aa.course_id as varchar(50))=cast(sad.course_id as varchar(50)) and aa.course_attribute_id=1 and cast(sad.course_id  as varchar(50)) like '7%'
+inner join  (select * from "phoenix-master_setup_service"."course_attribute_master" where  course_attribute_disp_val='CORP' )  cam on cam.id =aa.course_attribute_id
+inner join "phoenix-master_setup_service"."course_attribute_value_master" cavm on cavm.id= aa.attribute_value_id
+inner join (SELECT * FROM "phoenix-enrollment_service".material_master WHERE course_attribute IS NOT NULL AND plant_id = 'HO01' AND is_deleted = 0 AND material_status = 'ACTIVE')mm on mm.course_attribute = cavm.course_attribute_value_disp_val
+left  join (select * from "phoenix-master_setup_service".business_area_master) f on  sad.business_area_value=f.business_area_disp_val
+
+left JOIN
+"phoenix-master_setup_service".business_area_region_master barm ON f.id = barm.business_area_id
+    left JOIN
+"phoenix-master_setup_service".region_master rm ON cast( barm.region_id as varchar(50)) = cast(rm.region_key as varchar(50))
+where cast(sad.course_id  as varchar(50)) like '7%' and sad.program_action IN ( 'MATR', 'BTCG', 'RADM' ) 
+)
+where 
+-- course_id like '7%' and 
+business_area_value not in ( 'IC006', 'DW005' ) and substring(term_value,3,2) >='24'
+) tp
+LEFT JOIN ( select
+transaction_id,
+primary_batch_id,
+secondary_batch_id,
+course_id,
+psid,
+application_id,
+type,
+status,
+material_number,
+material_description,
+barcode,
+reason,
+plant_id,
+issue_date,
+return_transaction_id,
+sap_doc_id,term,business_area,
+transaction_type from (SELECT *, row_number() over (partition by psid, application_id, material_number order by updated_on desc ) rn  FROM   "phoenix-enrollment_service".stock_transaction_aud WHERE is_deleted=0 and  type = 'PSID_ISSUANCE' ) where rn=1 ) audTable 
+ON  tp.psid=audTable.psid and 
+tp. application_id = audTable. application_id
+and cast(tp.material as varchar(50))=cast(audTable.material_number as varchar(50))
+
+left join 
+(select course_id,academic_term,business_area,course_start_date,
+course_end_date from (select  course_id,academic_term,business_area,course_start_date,
+course_end_date,row_number() over(partition by course_id,academic_term,business_area	
+ order by transaction_id desc) rn from "phoenix_pricing_service".course_fees_processing_approval
+  where course_fee_status='L2Approved') where rn=1)  n 
+ on audTable.course_id =n.course_id and audTable.term=n.academic_term and audTable.business_area=n.business_area
+--AND tp. business_area = audTable. business_area
+)
+)
+where ( primary_batch is not null or secondary_batch is not null )
+and CAST(SUBSTRING(term_value, -2) AS INTEGER) >= EXTRACT(YEAR FROM CURRENT_DATE) % 100
+and CAST(SUBSTRING(term_value, 1,2) AS INTEGER) < ((EXTRACT(YEAR FROM CURRENT_DATE) % 100)+1)
