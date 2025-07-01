@@ -2,6 +2,10 @@
 
 This document outlines the project details for the Stock Report at Aakash Educational Services Limited.
 
+## Current Focus
+
+We are currently in the process of documenting the existing Stock Report's technical details. The next step is for Laksh to provide the datasets and SQL queries, which will be recorded in the `Stock_Report_Technical_Details.md` file for analysis and future refactoring.
+
 ## Project Overview
 
 The Stock Report is a critical report that provides insights into stock issuance. It is currently facing some challenges that need to be addressed.
