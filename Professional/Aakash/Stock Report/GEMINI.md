@@ -2,9 +2,11 @@
 
 This document outlines the project details for the Stock Report at Aakash Educational Services Limited.
 
-## Current Focus
+## Project Status
 
-We are currently in the process of documenting the existing Stock Report's technical details. The next step is for Laksh to provide the datasets and SQL queries, which will be recorded in the `Stock_Report_Technical_Details.md` file for analysis and future refactoring.
+The initial reverse-engineering and documentation phase is complete. The technical details of the existing Stock Report, including its 8 sheets and underlying SQL queries, have been fully documented in the `Stock_Report_Technical_Details.md` file.
+
+The next phase will focus on addressing the project's primary objectives: fixing outstanding bugs and planning the refactoring of the data pipeline.
 
 ## Project Overview
 
