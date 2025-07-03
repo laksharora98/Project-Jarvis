@@ -67,4 +67,4 @@ This largely stays the same conceptually, but we swap local tools for their AWS 
     *   [x] Created the `frontend` and `backend` sub-directories.
     *   [x] Initialized the backend with `npm init -y`.
     *   [x] Initialized the frontend with `npm create vite@latest`.
-*   **Next Step**: Discuss and run `npm install` in both the `frontend` and `backend` directories to install their dependencies.
+*   **Next Step**: Paused. Resume by running `npm install` in both the `frontend` and `backend` directories to install their dependencies.
