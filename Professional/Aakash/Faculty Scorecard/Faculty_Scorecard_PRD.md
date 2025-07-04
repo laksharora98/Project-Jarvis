@@ -11,19 +11,19 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 
 ### 1.3 Scope
 
-#### 1.3.1 In-Scope for V1
-*   Calculation and display of all non-manual Key Performance Indicators (KPIs).
+#### 1.3.1 In-Scope for V3
+*   Calculation and display of all non-manual Key Performance Indicators (KPIs) as defined in this document.
 *   Implementation of all business logic for system-driven KPIs.
-*   A basic report interface displaying the final faculty leaderboard.
-*   Provision of all raw data necessary for users to understand and validate the calculated scores (i.e., "reverse engineer" the final score).
+*   A new, to-be-defined report interface on AakashGuru for displaying the V3 leaderboard.
+*   Provision of all necessary raw data for users to understand and validate the calculated scores.
 
-#### 1.3.2 Out-of-Scope for V1
-*   Integration or handling of manual KPIs.
-*   Automated, continuous data refresh jobs (e.g., weekly/monthly refreshes) – the initial release may involve a manual or less frequent refresh mechanism.
+#### 1.3.2 Out-of-Scope for V3
+*   Integration or handling of manual KPIs (these are documented as future scope).
+*   Automated, continuous data refresh jobs (e.g., weekly/monthly refreshes) – the initial V3 release may involve a manual or less frequent refresh mechanism.
 
-## 2. Key Performance Indicators (KPIs) - V1 Scope
+## 2. Key Performance Indicators (KPIs) - V3 Scope
 
-Based on the `Faculty Scorecard V3.pdf`, the following non-manual KPIs are in scope for the initial release (V1):
+The following non-manual KPIs are in scope for V3:
 
 ### 2.1 Academic Effectiveness
 
@@ -70,11 +70,11 @@ Based on the `Faculty Scorecard V3.pdf`, the following non-manual KPIs are in sc
 
 ## 3. Detailed KPI Definitions & Business Logic
 
-This section provides detailed definitions, calculation logic, and considerations for each KPI, including those in scope for V1 and those planned for future phases (manual KPIs).
+This section provides detailed definitions, calculation logic, and considerations for each KPI, including those in scope for V3 and those planned for future phases (manual KPIs).
 
 ### 3.1 Manual KPIs (Future Scope)
 
-The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and are out of scope for V1, but will be considered for future phases:
+The following KPIs are identified as manual and are out of scope for V3, but will be considered for future phases:
 
 *   **Productivity (Scheduled classes + QRC + Content Enrich)**
     *   **Weightage:** 10%
@@ -96,16 +96,16 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
     *   **Remarks:** Manual data pipeline already built for a QS Report. How to get which faculty is taking PTM? Can we use AakashGuru student comments data?
 
 *   **Students & Parents Counseling**
-    *   **Weightage:** Not specified in V3.pdf table, but listed as manual.
+    *   **Weightage:** (Not specified, listed as manual).
     *   **High-Level Definition:** Manual assessment of counseling activities.
     *   **Remarks:** Faculty Employee ID, Score required.
 
 *   **School Performance**
-    *   **Weightage:** Not specified in V3.pdf table, but listed as manual.
+    *   **Weightage:** (Not specified, listed as manual).
     *   **High-Level Definition:** Manual assessment of school performance.
     *   **Remarks:** Faculty Employee ID, Score required.
 
-### 3.2 Non-Manual KPIs (V1 Scope)
+### 3.2 Non-Manual KPIs (V3 Scope)
 
 #### 3.2.1 Test Performance
 *   **KRA:** Academic effectiveness
@@ -116,11 +116,11 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
     *   For every student and subject, calculate the percentage of tests where they scored above the national average.
     *   Compute the faculty's average percentage across all students.
     *   Convert to a score out of 100, then scale according to weightage.
-*   **Test Types Considered (from V1.pdf):**
+*   **Test Types Considered:**
     *   SOE: Unit Test, Term Exam, AIATS
     *   SOM: Practice Test, Term Exam, AIATS, Fortnightly Tests
     *   SOF: Fortnightly Subjective Test, Term Exam, Cumulative Subjective Test, Objective Test, AIATS
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Causality: Should tests given by student during or just after being taught by this faculty be included? How to determine this?
     *   Test IDs are currently determined using a subjective manual process by getting all tests conducted in scoretool, vyom. This cannot be continued.
 
@@ -129,14 +129,14 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 10%
 *   **High-Level Definition:** Pace of syllabus completion or comparison with targets given against academic plan.
 *   **Data Source:** Aakash Guru
-*   **Calculation Logic (from V1.pdf):**
+*   **Calculation Logic:**
     *   Total classes scheduled in Phoenix (Apr - Nov)
     *   Percentage = (Lectures marked in AakashGuru) / (Total lectures)
     *   Scoring:
         *   ≥ 80% → Full marks
         *   ≤ 50% → Zero marks
         *   Scale as per weightage.
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Number of Planned Lecture equivalent syllabus completed / Target Planned Lecture completion for this academic plan, subject, duration?
     *   Distribute between all faculty who have taken lectures for that batch and subject in proportion of the number of lectures taken?
 
@@ -145,9 +145,9 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per class (excluding PTM) among the students mapped to this faculty.
 *   **Data Sources:** AakashGuru, RFID, MS Teams, Crystal, Phoenix
-*   **Calculation Logic (from V3.pdf):**
+*   **Calculation Logic:**
     *   Average Attendance per class (excluding PTM) among the students mapped to this faculty.
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Number of Lectures Marked / Total Lectures Scheduled? - Do Coordinators/EDP also mark attendance? Should attendance marked by them be included?
 
 #### 3.2.4 Test Attendance
@@ -155,9 +155,9 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per test among students mapped to this faculty (initially for SOE stream only).
 *   **Data Sources:** Phoenix, Vyom, Scoretool
-*   **Calculation Logic (from V3.pdf):**
+*   **Calculation Logic:**
     *   Average Attendance per test among students mapped to this faculty.
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Only for SOE.
     *   Should causality be required similar to test performance?
     *   Scores for SOM and SOF?
@@ -167,11 +167,11 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 15%
 *   **High-Level Definition:** Student feedback for subjects taught by the faculty (currently CSAT only, averaged across all survey questions).
 *   **Data Source:** MyAakash
-*   **Calculation Logic (from V1.pdf):**
+*   **Calculation Logic:**
     *   Compute average student feedback for subjects taught by the faculty.
     *   Feedback is taken from CSAT surveys conducted in July & October via the MyAakash App.
     *   Scale the score as per weightage.
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Currently only CSAT is included. All questions answered across all surveys are averaged into a single score.
     *   Should causality be included similar to test performance?
     *   Should recent surveys weigh higher?
@@ -182,9 +182,9 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 10%
 *   **High-Level Definition:** Percentage of students who left the program.
 *   **Data Source:** Phoenix
-*   **Calculation Logic (from V1.pdf):**
+*   **Calculation Logic:**
     *   Determine the percentage of students who left the program.
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Currently no causality is considered. Student may have discontinued before this faculty taught them.
 
 #### 3.2.7 Student Retention - Internal Conversion
@@ -192,25 +192,25 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 *   **Weightage:** 10%
 *   **High-Level Definition:** ICE conversion will affect scores of faculty that taught in previous course.
 *   **Data Source:** Phoenix
-*   **Key Considerations/Open Questions (from V3.pdf):**
+*   **Key Considerations/Open Questions:**
     *   Stream Wise normalisation may be required as generally ICE is lower for SOE than SOM.
     *   How to handle when data not available?
 
 ## 4. Eligibility Criteria
 
-### 4.1 Faculty Eligibility for Scorecard Inclusion (from V1.pdf & V3.pdf)
+### 4.1 Faculty Eligibility for Scorecard Inclusion
 
 *   Faculty members with fewer than 8 lectures taken for all batches during this period or missing data for any factor will not be included in the ranking.
-*   Their list will be published separately in the second visual (Faculty not included in scorecard).
-*   Other active faculties in HONO who haven't taken even a single lecture are published at the bottom (Faculty active in HONO with 0 classes).
-*   All faculty who are eligible for a national rank based on the 8 classes threshold and have a score against all 4 parameters are present in the main scorecard visual.
+*   Their list will be published separately.
+*   Other active faculties in HONO who haven't taken even a single lecture are also published separately.
+*   All faculty who are eligible for a national rank based on the 8 classes threshold and have a score against all 4 parameters are present in the main scorecard.
 
-### 4.2 Faculty Eligibility for National Ranking (from V1.pdf)
+### 4.2 Faculty Eligibility for National Ranking
 
 *   Faculty may teach multiple batches and subjects.
 *   Faculty should have taken at least 8 classes for at least one student to be eligible for a national rank.
 
-### 4.3 Key Considerations/Open Questions (from V3.pdf)
+### 4.3 Key Considerations/Open Questions
 
 *   **How to get total list of faculty eligible for this?**
     *   All Active Faculty in HONO?
@@ -251,20 +251,22 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
 
 ### 5.2 Report Refresh Frequency
 
-*   As required (from V3.pdf).
+*   As required.
 
 ### 5.3 Report Data Start Date
 
-*   1 Apr 2024 - 31 Mar 2025 (from V3.pdf).
+*   1 Apr 2024 - 31 Mar 2025.
 
-### 5.4 Report UI Details & Visuals
+### 5.4 Report UI Details & Visuals (V2 Reference)
+
+***Note:*** *The following section describes the visuals and reports from the V2 implementation of the Faculty Scorecard, which was built on AWS Quicksight. This information is preserved here as a reference for brainstorming and designing the new V3 UI, which will be delivered on AakashGuru.*
 
 #### 5.4.1 Sheet 1: Scorecard (Main Leaderboard)
 
 *   All faculty who are eligible for a national rank based on the 8 classes threshold and have a score against all 4 parameters are present in this visual.
 *   There is an AIR Rank.
 *   There is a dynamic rank based on the filters selected.
-*   **Columns (from V3.pdf screenshot):** S.No, Regions, Branch Types, Branch Codes, Branch Names, Streams, Faculty ID, Faculty Name, Subjects, Student Test Performance, Syllabus Compliance, Student Retention, CSAT Feedback, Final Score (out of 70), Percentage, Rank, AIR.
+*   **Columns:** S.No, Regions, Branch Types, Branch Codes, Branch Names, Streams, Faculty ID, Faculty Name, Subjects, Student Test Performance, Syllabus Compliance, Student Retention, CSAT Feedback, Final Score (out of 70), Percentage, Rank, AIR.
 
 #### 5.4.2 Sheet 2: Faculty not included in scorecard
 
@@ -273,16 +275,16 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
     *   They have taken more than 8 lectures for at least one batch but at least one of the four parameters does not have a score due to one of following reasons:
         *   Student Test Performance - No student gave a test which had a section corresponding to the subject taught by this faculty.
         *   CSAT Feedback - No student gave feedback for the subject taught by this faculty.
-*   **Columns (from V3.pdf screenshot):** Regions, Branch Types, Branch Codes, Branch Names, Streams, Faculty ID, Faculty Name, Subjects, Student Test Performance, Syllabus Compliance, Student Retention, CSAT Feedback, Final Score.
+*   **Columns:** Regions, Branch Types, Branch Codes, Branch Names, Streams, Faculty ID, Faculty Name, Subjects, Student Test Performance, Syllabus Compliance, Student Retention, CSAT Feedback, Final Score.
 
 #### 5.4.3 Sheet 3: Faculty active in HONO with 0 classes
 
 *   This visual has any faculty who was active in HONO during this period but hasn't taken even a single class during the same period.
 *   These have been published so that the report is exhaustive.
 *   Every faculty will be part of one of Visual 1, Visual 2 and Visual 3.
-*   **Columns (from V3.pdf screenshot):** Faculty ID, Faculty Name, Role Name, Department, Branch Name, Date of Joining.
+*   **Columns:** Faculty ID, Faculty Name, Role Name, Department, Branch Name, Date of Joining.
 
-#### 5.4.4 Deep Dive Sheets (from V3.pdf screenshots)
+#### 5.4.4 Deep Dive Sheets
 
 *   **Student Test Performance:**
     *   **Columns:** Regions, Branch Types, Streams, Branch Codes, Branch Names, Faculty ID, Faculty Name, Subjects, Total Students, Above Average Percentage, Final Score (Out of 10).
@@ -300,7 +302,7 @@ The following KPIs are identified as manual in `Faculty Scorecard V3.pdf` and ar
     *   **Columns:** Regions, Branch Types, Streams, Branch Codes, Branch Names, Faculty ID, Faculty Name, Subjects, Student Count, Faculty Feedback Rating (out of 5), Score (Out of 20).
     *   **Details:** Student Count - Number of students who gave feedback for the subject taught by the faculty. Rating (out of 5) - Average Rating across all questions for this subject. Average Feedback (out of 5). Final Score (out of 20) - based on scaling the above average feedback score out of 20.
 
-#### 5.4.5 Mapping Visuals (from V3.pdf screenshots)
+#### 5.4.5 Mapping Visuals
 
 *   **Faculty-Batch Mapping:**
     *   **Columns:** Faculty ID, Faculty Name, Region, Stream, Branch Type, Branch Code, Branch Name, Subject, Batch Name, Lecture Count.

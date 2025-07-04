@@ -22,7 +22,7 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 *   **Data Lake**: AWS (Athena, Glue, etc.)
 *   **Reporting**: AWS Quicksight
 
-## Key Considerations (from V3.pdf)
+## Key Considerations
 
 *   **KRAs & KPIs**: Academic effectiveness and initiative, Student Retention, Compliance, Feedback.
 *   **Data Sources**: Various internal systems (e.g., AakashGuru, Vyom, Scoretool, Phoenix, HONO, MyAakash, RFID, MS Teams, Crystal, Google Form).
@@ -32,9 +32,16 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 
 *   **Faculty_Scorecard_PRD.md**: This document serves as the comprehensive Product Requirements Document (PRD) for the Faculty Scorecard project, containing all relevant details including KRAs, KPIs, data sources, weightages, and various considerations.
 
-## Open Questions & Future Discussions
+## Current Focus: V3 Logic Definition
+
+*   **Task**: Solidify the business logic for the V3 Faculty Scorecard.
+*   **Status**: The KPIs and metrics outlined in the PRD are the correct goal for V3. However, the UI and visuals described in the PRD are from the V2 report and will be redesigned. The UI discussion is deferred until the core logic is finalized.
+*   **Next Step**: Address the open questions from the V2 analysis to define the V3 logic, starting with Faculty & Student Mapping.
+
+## Open Questions for V3
 
 *   Detailed logic for faculty eligibility, student/batch mapping, and handling edge cases (no classes, no students, missing data).
 *   Automated solution for identifying relevant test types and IDs.
 *   Definitive logic for handling multiple student applications for ICE/retention.
 *   Ensuring causality for survey data and other parameters.
+*   (Future) UI/UX design for the V3 report on AakashGuru.
