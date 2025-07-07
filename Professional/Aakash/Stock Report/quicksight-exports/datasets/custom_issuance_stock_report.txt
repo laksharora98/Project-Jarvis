@@ -1,10 +1,8 @@
 select *				 from (
-select *,
--- case when transaction_id is null then 'Not Issued' else 'Issued' end is_issued  
+select *,  
 case when transaction_id is not null and upper(status)='SUCCESS' and return_transaction_id is null then 'Issued' else 'Not Issued' end is_issued
 from ( select distinct  tp.student_name,tp.psid,tp.application_id,tp.business_area_value as business_unit,
 tp.term_value,tp.course_id,tp.program_action,tp.region_disp_val region ,
---tp.primary_batch_id,tp.secondary_batch_id,
 tp.primary_batch,
 tp.secondary_batch,
 tp.course_attribute_disp_val,
@@ -66,7 +64,6 @@ left JOIN
 where cast(sad.course_id  as varchar(50)) like '7%' and sad.program_action IN ( 'MATR', 'BTCG', 'RADM' ) 
 )
 where 
--- course_id like '7%' and 
 business_area_value not in ( 'IC006', 'DW005' ) and substring(term_value,3,2) >='24'
 ) tp
 LEFT JOIN ( select
@@ -98,7 +95,6 @@ course_end_date,row_number() over(partition by course_id,academic_term,business_
  order by transaction_id desc) rn from "phoenix_pricing_service".course_fees_processing_approval
   where course_fee_status='L2Approved') where rn=1)  n 
  on audTable.course_id =n.course_id and audTable.term=n.academic_term and audTable.business_area=n.business_area
---AND tp. business_area = audTable. business_area
 )
 )
 where ( primary_batch is not null or secondary_batch is not null )

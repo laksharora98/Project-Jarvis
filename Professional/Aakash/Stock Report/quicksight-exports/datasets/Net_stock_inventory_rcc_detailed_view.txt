@@ -28,8 +28,6 @@ FROM
         INNER JOIN
     "phoenix-enrollment_service".material_grn_numbers F ON F.plant_id = A.sap_plant_id
 WHERE
--- D.business_unit_type_disp_val = 'Owned'
---   AND  E.region_disp_val = 'Delhi-NCR1'  and 
 F.is_deleted = 0
         AND F.STATUS = 'ACTIVE' and A.business_area_key not in ('DW005','IC006','DW007')
         AND F.is_consumed = 0

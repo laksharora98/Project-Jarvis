@@ -5,8 +5,6 @@ select stu_con.*, concat(stu_con.created_by,' (',up.first_name,' ' ,up.last_name
     END AS Material_type,
 b.primary_batch,
 c.secondary_batch,d.course_title,
--- d.effective_from as course_start_date,
--- d.effective_to as course_end_date,
 n.course_start_date,
 n.course_end_date,
 ca.crse_attr_value,
@@ -21,26 +19,19 @@ coalesce(butm.business_unit_type_disp_val,'NA') branch_type
 from (
 select psid,application_id,
 academic_career_value,--this column contains RCC or DLP
---'stream' as Stream,--this column not present
 term,
 term_value,course_id,
--- 'course_start_date' as course_start_date, --this column not present
--- 'course_end_date' as course_end_date,--this column not present
--- 'Registration_date'as Registration_date,--this column not present
 plant_id,
 business_area,
 business_area_value as business_unit,
 primary_batch_id,
 secondary_batch_id,
 program_action,
---'last payment received' as last_payment_received,--this column not present
 material_number,
 material_description,
 barcode,
---'material quantity issued' as material_quantity_issued,--this column not present
 sap_doc_id,
 type,
--- transaction_type,
 transaction_id,
 "date_add"('minute', 330,issue_date) issue_date,
 created_by,
@@ -53,8 +44,6 @@ is_deleted,
 return_transaction_id,
 student_name,
 return_mode,
--- receipt_id,
--- remark,
 cost_center
  from "phoenix-enrollment_service".stock_transaction_aud
  where academic_career_value='RCC' and STATUS = 'FAILED'

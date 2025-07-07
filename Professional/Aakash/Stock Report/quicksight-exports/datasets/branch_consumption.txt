@@ -13,7 +13,6 @@ coalesce(butm.business_unit_type_disp_val,'NA') as branch_type
 from (
 select psid,application_id,
 academic_career_value,--this column contains RCC or DLP
--- term,
 term_value,course_id,
 plant_id,
 business_area,
@@ -43,7 +42,6 @@ remark,
 uom,
 cost_center
  from "phoenix-enrollment_service".stock_transaction_aud
- --where academic_career_value='RCC'  and STATUS = 'SUCCESS'
  where type in ('BRANCH_ISSUANCE','BRANCH_RETURN') and STATUS = 'SUCCESS'
  ) a
 inner join (select material_id,material_description,serial_number_profile from (select material_id,material_description,serial_number_profile ,row_number() over(partition by material_id order by updated_on desc) rn  from "phoenix-enrollment_service".material_master ) where rn=1)  mm
