@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styling with CSS</title>
+
+  <!-- Link to our external stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Internal Stylesheet -->
+  <style>
+    /* This is an internal CSS comment */
+    h2 {
+      color: blue; /* This will be overridden by the external stylesheet */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Styling with CSS</h1>
+
+  <!-- Inline Style -->
+  <p style="color: green; font-size: 18px;">
+    This paragraph uses an inline style to be green and have a larger font size.
+  </p>
+
+  <h2>This is a Subheading</h2>
+
+  <p class="highlight">
+    This paragraph has a class. We will style it from our external file.
+  </p>
+
+  <p id="unique">
+    This paragraph has an ID. We will also style this from our external file.
+  </p>
+
+</body>
+</html>

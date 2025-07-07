@@ -5,6 +5,7 @@ This directory contains professional work related to Aakash Educational Services
 -   **Faculty Scorecard**: A project to build a comprehensive leaderboard for faculty performance and engagement.
 -   **Stock Report**: A project to fix bugs and refactor the stock issuance report.
 -   **Concept Kundali**: A project to analyze student performance at a concept level.
+-   **Data Platform Standards**: Centralized standards and best practices for the data platform.
 
 ## Key Systems & Schemas
 

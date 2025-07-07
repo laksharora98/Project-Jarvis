@@ -1,0 +1,35 @@
+/* This is an external CSS comment */
+
+/* --- Basic CSS Rule --- */
+/* selector { property: value; } */
+
+/* This rule targets the <body> tag */
+body {
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+/* This rule targets all <h1> tags */
+h1 {
+  color: navy;
+}
+
+/* This rule targets all <h2> tags */
+h2 {
+  color: purple; /* This will override the internal style */
+}
+
+/* --- Class Selector --- */
+/* This rule targets any element with class="highlight" */
+.highlight {
+  background-color: #ffffdd; /* A light yellow */
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* --- ID Selector --- */
+/* This rule targets the single element with id="unique" */
+#unique {
+  font-style: italic;
+  color: darkred;
+}
