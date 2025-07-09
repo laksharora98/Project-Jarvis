@@ -61,6 +61,11 @@ The following non-manual KPIs are in scope for V3:
     *   **High-Level Definition:** Pace of syllabus completion or comparison with targets given against academic plan.
     *   **Data Source:** Aakash Guru
 
+*   **Class Attendance Compliance**
+    *   **Weightage:** 5%
+    *   **High-Level Definition:** Measures whether the faculty marked attendance for a scheduled lecture in AakashGuru.
+    *   **Data Source:** AakashGuru, Phoenix
+
 ### 2.4 Feedback
 
 *   **Student Feedback - CSAT (80%) / NPS (20%)**
@@ -140,7 +145,20 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
     *   Number of Planned Lecture equivalent syllabus completed / Target Planned Lecture completion for this academic plan, subject, duration?
     *   Distribute between all faculty who have taken lectures for that batch and subject in proportion of the number of lectures taken?
 
-#### 3.2.3 Students Class Attendance
+#### 3.2.3 Class Attendance Compliance
+*   **KRA:** Compliance
+*   **Weightage:** 5%
+*   **High-Level Definition:** Measures whether the faculty marked attendance for a scheduled lecture in AakashGuru.
+*   **Data Sources:** AakashGuru, Phoenix
+*   **Calculation Logic:**
+    *   For each faculty, calculate the percentage of their scheduled lectures for which they marked attendance in AakashGuru.
+    *   Percentage = (Lectures with attendance marked by faculty) / (Total scheduled lectures for faculty)
+    *   Scale the resulting percentage to a final score based on the 5% weightage.
+*   **Key Considerations/Open Questions:**
+    *   How to handle lectures where attendance might be marked by a coordinator or EDP? Should these be excluded from the faculty's denominator?
+    *   Confirm the source of truth for "scheduled lectures" is Phoenix.
+
+#### 3.2.4 Students Class Attendance
 *   **KRA:** Academic effectiveness
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per class (excluding PTM) among the students mapped to this faculty.
@@ -150,7 +168,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **Key Considerations/Open Questions:**
     *   Number of Lectures Marked / Total Lectures Scheduled? - Do Coordinators/EDP also mark attendance? Should attendance marked by them be included?
 
-#### 3.2.4 Test Attendance
+#### 3.2.5 Test Attendance
 *   **KRA:** Academic effectiveness
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per test among students mapped to this faculty (initially for SOE stream only).
@@ -162,7 +180,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
     *   Should causality be required similar to test performance?
     *   Scores for SOM and SOF?
 
-#### 3.2.5 Student Feedback - CSAT (80%) / NPS (20%)
+#### 3.2.6 Student Feedback - CSAT (80%) / NPS (20%)
 *   **KRA:** Feedback
 *   **Weightage:** 15%
 *   **High-Level Definition:** Student feedback for subjects taught by the faculty (currently CSAT only, averaged across all survey questions).
@@ -177,7 +195,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
     *   Should recent surveys weigh higher?
     *   Are all questions equally relevant?
 
-#### 3.2.6 Student Retention - Left Out
+#### 3.2.7 Student Retention - Left Out
 *   **KRA:** Student Retention
 *   **Weightage:** 10%
 *   **High-Level Definition:** Percentage of students who left the program.
@@ -187,7 +205,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **Key Considerations/Open Questions:**
     *   Currently no causality is considered. Student may have discontinued before this faculty taught them.
 
-#### 3.2.7 Student Retention - Internal Conversion
+#### 3.2.8 Student Retention - Internal Conversion
 *   **KRA:** Student Retention
 *   **Weightage:** 10%
 *   **High-Level Definition:** ICE conversion will affect scores of faculty that taught in previous course.

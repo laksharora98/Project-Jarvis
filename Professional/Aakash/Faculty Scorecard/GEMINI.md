@@ -26,17 +26,18 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 
 *   **KRAs & KPIs**: Academic effectiveness and initiative, Student Retention, Compliance, Feedback.
 *   **Data Sources**: Various internal systems (e.g., AakashGuru, Vyom, Scoretool, Phoenix, HONO, MyAakash, RFID, MS Teams, Crystal, Google Form).
-*   **Delivery Platform**: AakashGuru (primary), Looker (backup).
+*   **Delivery Platform**: AWS Quicksight.
 
 ## Detailed Documentation
 
-*   **Faculty_Scorecard_PRD.md**: This document serves as the comprehensive Product Requirements Document (PRD) for the Faculty Scorecard project, containing all relevant details including KRAs, KPIs, data sources, weightages, and various considerations.
+*   [Faculty_Scorecard_PRD.md](./Faculty_Scorecard_PRD.md): The official Product Requirements Document for the V3 project.
+*   [Faculty_Scorecard_V3_Implementation_Details.md](./Faculty_Scorecard_V3_Implementation_Details.md): The technical implementation log for the V3 data pipeline.
 
-## Current Focus: V3 Logic Definition
+## Current Focus: V3 Implementation
 
-*   **Task**: Solidify the business logic for the V3 Faculty Scorecard.
-*   **Status**: The KPIs and metrics outlined in the PRD are the correct goal for V3. However, the UI and visuals described in the PRD are from the V2 report and will be redesigned. The UI discussion is deferred until the core logic is finalized.
-*   **Next Step**: Address the open questions from the V2 analysis to define the V3 logic, starting with Faculty & Student Mapping.
+*   **Task**: Build the V3 Faculty Scorecard data pipeline in AWS Athena.
+*   **Status**: The project has moved from planning to implementation. A new technical documentation file has been created to log the process.
+*   **Next Step**: Create the new Athena database and begin building the first view based on the defined business logic. Waiting for the user to provide the official database name.
 
 ## Open Questions for V3
 
