@@ -132,31 +132,29 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 #### 3.2.2 Syllabus Compliance
 *   **KRA:** Compliance
 *   **Weightage:** 10%
-*   **High-Level Definition:** Pace of syllabus completion or comparison with targets given against academic plan.
-*   **Data Source:** Aakash Guru
+*   **High-Level Definition:** Measures whether the faculty marked the syllabus topics they covered for each lecture they delivered.
+*   **Data Source:** Phoenix Timetable Data (with compliance flag)
 *   **Calculation Logic:**
-    *   Total classes scheduled in Phoenix (Apr - Nov)
-    *   Percentage = (Lectures marked in AakashGuru) / (Total lectures)
+    *   For each faculty, calculate the percentage of their delivered lectures for which they marked syllabus completion.
+    *   Percentage = (Lectures with syllabus marked by faculty) / (Total lectures delivered by faculty)
     *   Scoring:
         *   ≥ 80% → Full marks
         *   ≤ 50% → Zero marks
-        *   Scale as per weightage.
+        *   Scale linearly for percentages between 50% and 80%.
 *   **Key Considerations/Open Questions:**
-    *   Number of Planned Lecture equivalent syllabus completed / Target Planned Lecture completion for this academic plan, subject, duration?
-    *   Distribute between all faculty who have taken lectures for that batch and subject in proportion of the number of lectures taken?
+    *   This KPI is now based on the faculty's own actions per lecture and does not require batch-level aggregation for Phase 1.
 
 #### 3.2.3 Class Attendance Compliance
 *   **KRA:** Compliance
 *   **Weightage:** 5%
-*   **High-Level Definition:** Measures whether the faculty marked attendance for a scheduled lecture in AakashGuru.
-*   **Data Sources:** AakashGuru, Phoenix
+*   **High-Level Definition:** Measures whether the faculty marked student attendance for each lecture they delivered.
+*   **Data Source:** Phoenix Timetable Data (with compliance flag)
 *   **Calculation Logic:**
-    *   For each faculty, calculate the percentage of their scheduled lectures for which they marked attendance in AakashGuru.
-    *   Percentage = (Lectures with attendance marked by faculty) / (Total scheduled lectures for faculty)
+    *   For each faculty, calculate the percentage of their delivered lectures for which they marked student attendance.
+    *   Percentage = (Lectures with attendance marked by faculty) / (Total lectures delivered by faculty)
     *   Scale the resulting percentage to a final score based on the 5% weightage.
 *   **Key Considerations/Open Questions:**
-    *   How to handle lectures where attendance might be marked by a coordinator or EDP? Should these be excluded from the faculty's denominator?
-    *   Confirm the source of truth for "scheduled lectures" is Phoenix.
+    *   This KPI is based on the faculty's own actions per lecture. It does not depend on whether a coordinator or EDP also marked attendance.
 
 #### 3.2.4 Students Class Attendance
 *   **KRA:** Academic effectiveness
@@ -237,7 +235,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **How to get faculty-student mapping?**
     *   Currently, faculty has to take at least 8 classes for a particular subject for a student for that student's attributes to affect this faculty's score for that subject.
 *   **How to get faculty-batch mapping?**
-    *   Currently, greater than or equal to 25% of total scheduled lectures for that batch.
+    *   For Phase 1, this is no longer required for most KPIs. The two compliance KPIs (Syllabus and Class Attendance) have been simplified to be per-lecture, based on flags in the timetable data, removing the need for batch-level mapping.
 *   **Score for faculty who did not take any classes?**
     *   Currently no rank is generated for these.
 *   **Score for faculty who has no student mapped?**
@@ -256,9 +254,23 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
         *   Application number DESC.
     *   Suggested additional enhancement - Only take long term courses.
 *   **Ensuring causality for survey data and other parameters.**
-    *   For every parameter, causality to be ensured - e.g., a survey taken in November should not affect a Faculty's score who started teaching the student in December.
+    *   For every parameter, causality to be ensured - e.g., a survey taken in November should not affect a Faculty's score who started teaching the student in December. This will be handled by the `faculty-student` mapping and defined attribution windows (see section 4.4).
 *   **Will faculty scorecard require score for a duration across academic years?**
     *   No.
+
+### 4.4 Causality and Attribution Logic
+
+To ensure fairness and accuracy, the attribution of a student's actions (e.g., test performance, feedback) to a faculty member is strictly defined by a mapping period and a subsequent "attribution window."
+
+1.  **Faculty-Student Mapping:** A student is considered "mapped" to a faculty for a specific subject during a contiguous block of time when the faculty is actively teaching them. This is determined based on class schedules. A faculty must teach a certain percentage of classes (e.g., >25%) for a student-subject combination to establish a mapping. This mapping has a clear `start_date` and `end_date`.
+
+2.  **Attribution Windows:** For KPIs that have a lagging effect, a configurable "attribution window" is applied, extending from the `mapping_end_date`. An event must occur within this window to be counted towards the faculty's score.
+
+    *   **Test Performance & Test Attendance:** The event (test taken) must occur during the mapping period or within a **60-day window** after the mapping ends.
+    *   **Student Feedback (CSAT):** The event (feedback given) must occur during the mapping period or within a **90-day window** after the mapping ends.
+    *   **Student Retention (Left Out):** The event (student's `left_out_date`) must occur during the mapping period or within a **90-day window** after the mapping ends.
+    *   **Direct Compliance/Attendance KPIs:** For Student Class Attendance, Syllabus Compliance, and Class Attendance Compliance, the attribution window is **0 days**. The events must occur strictly within the mapping period.
+    *   **Internal Conversion (ICE):** This is event-based, not time-based. It is determined by a student's re-enrollment in a subsequent course after being taught by the faculty in a course ending in the current period.
 
 ## 5. Reporting & Visualization
 
