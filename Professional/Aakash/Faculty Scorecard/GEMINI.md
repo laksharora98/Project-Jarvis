@@ -35,9 +35,13 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 
 ## Current Focus: V3 Implementation
 
-*   **Task**: Build the V3 Faculty Scorecard data pipeline in AWS Athena.
-*   **Status**: Phase 1 of the V3 implementation is complete. All data views have been defined and finalized in `Faculty_Scorecard_V3_Implementation_Details.md`.
-*   **Next Step**: The SQL scripts are ready for execution in AWS Athena.
+*   **Task**: Refine and enhance the V3 Faculty Scorecard data pipeline logic in AWS Athena.
+*   **Status**: The core SQL logic in `Faculty_Scorecard_V3_Implementation_Details.md` has been significantly enhanced to ensure fairer and more statistically robust scoring. Key improvements include:
+    *   **Percentile-Based Scoring:** Switched from raw scores to percentile ranks to normalize KPIs with different natural ranges.
+    *   **Minimum Data Thresholds:** Implemented rules to nullify KPI scores that don't have enough underlying data.
+    *   **Group-Based Normalization:** Applied stream-specific (e.g., SOM, SOE) ranking for retention and conversion KPIs to ensure fairer peer-to-peer comparisons.
+    *   All related documentation (`Faculty_Scorecard_PRD.md`, `kpi_definitions_for_business_users.md`) has been updated to reflect these changes.
+*   **Next Step**: Paused. The enhanced SQL scripts are ready for final review and execution in AWS Athena.
 
 ## Open Questions for V3
 

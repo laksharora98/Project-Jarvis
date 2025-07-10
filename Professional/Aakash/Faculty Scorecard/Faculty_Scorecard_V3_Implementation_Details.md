@@ -612,7 +612,7 @@ WHERE
 ```
 
 ### 2.9. Final Scorecard View (Implemented)
-**Purpose:** This is the culminating view that aggregates all KPI metrics, calculates a final weighted score, and structures the data for direct consumption by the BI tool. It produces one row for each unique combination of student-derived attributes for a faculty member, with scores and aggregated dimension strings repeated on each row to facilitate advanced filtering in Quicksight.
+**Purpose:** This is the culminating view that aggregates all KPI metrics, calculates a final weighted score using percentile ranks for fairness, and structures the data for direct consumption by the BI tool. It introduces minimum data thresholds and group-based normalization for statistical reliability.
 
 ```sql
 CREATE OR REPLACE VIEW final_scorecard_vw AS
@@ -662,10 +662,11 @@ WITH
     SELECT faculty_id, COUNT(DISTINCT psid) AS students_converted
     FROM kpi_retention_ice_base_vw GROUP BY faculty_id
   ),
-  -- 3. Join all raw metrics and calculate individual 0-100 scores
+  -- 3. Join all raw metrics and calculate individual 0-100 scores, applying minimum data thresholds
   faculty_kpi_scores AS (
     SELECT
       hono.employee_id AS faculty_id,
+      hono.stream AS hono_stream,
       -- Raw Metrics
       st.total_students_taught,
       tp.tests_above_national_avg,
@@ -681,15 +682,15 @@ WITH
       fb.total_feedback_responses,
       rlo.students_left_out,
       rice.students_converted,
-      -- Individual Scores (0-100)
-      (CAST(tp.tests_above_national_avg AS DOUBLE) / NULLIF(tp.total_student_tests_attributed, 0)) * 100 AS test_performance_score,
-      (CAST(ta.tests_attempted AS DOUBLE) / NULLIF(ta.total_student_tests_assigned, 0)) * 100 AS test_attendance_score,
-      (CAST(sa.student_class_days_present AS DOUBLE) / NULLIF(sa.total_student_class_days, 0)) * 100 AS student_attendance_score,
-      (CAST(ca.syllabus_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS syllabus_compliance_score,
-      (CAST(ca.attendance_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS class_attendance_compliance_score,
-      ((fb.avg_feedback_rating - 1) / 4) * 100 AS feedback_score,
-      (CAST(st.total_students_taught - rlo.students_left_out AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 AS retention_score,
-      (CAST(rice.students_converted AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 AS conversion_score
+      -- Individual Scores (0-100) with Minimum Data Thresholds
+      CASE WHEN tp.total_student_tests_attributed >= 10 THEN (CAST(tp.tests_above_national_avg AS DOUBLE) / NULLIF(tp.total_student_tests_attributed, 0)) * 100 ELSE NULL END AS test_performance_score,
+      CASE WHEN ta.total_student_tests_assigned >= 10 THEN (CAST(ta.tests_attempted AS DOUBLE) / NULLIF(ta.total_student_tests_assigned, 0)) * 100 ELSE NULL END AS test_attendance_score,
+      (CAST(sa.student_class_days_present AS DOUBLE) / NULLIF(sa.total_student_class_days, 0)) * 100 AS student_attendance_score, -- No threshold for student attendance
+      (CAST(ca.syllabus_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS syllabus_compliance_score, -- No threshold for compliance
+      (CAST(ca.attendance_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS class_attendance_compliance_score, -- No threshold for compliance
+      CASE WHEN fb.total_feedback_responses >= 5 THEN ((fb.avg_feedback_rating - 1) / 4) * 100 ELSE NULL END AS feedback_score,
+      CASE WHEN st.total_students_taught >= 10 THEN (CAST(st.total_students_taught - rlo.students_left_out AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 ELSE NULL END AS retention_score,
+      CASE WHEN st.total_students_taught >= 10 THEN (CAST(rice.students_converted AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 ELSE NULL END AS conversion_score
     FROM eligible_faculty_hono_vw AS hono
     LEFT JOIN total_students_taught_agg AS st ON hono.employee_id = st.faculty_id
     LEFT JOIN test_performance_agg AS tp ON hono.employee_id = tp.faculty_id
@@ -700,25 +701,44 @@ WITH
     LEFT JOIN retention_leftout_agg AS rlo ON hono.employee_id = rlo.faculty_id
     LEFT JOIN retention_ice_agg AS rice ON hono.employee_id = rice.faculty_id
   ),
-  -- 4. Calculate the final weighted score
+  -- 4. NEW CTE: Calculate percentile rank for each KPI, partitioning by stream for retention and conversion
+  faculty_kpi_percentiles AS (
+    SELECT
+      faculty_id,
+      -- Raw metrics and scores to pass through
+      total_students_taught, tests_above_national_avg, total_student_tests_attributed, tests_attempted, total_student_tests_assigned, student_class_days_present, total_student_class_days, syllabus_marked_count, attendance_marked_count, total_lectures_delivered, avg_feedback_rating, total_feedback_responses, students_left_out, students_converted,
+      test_performance_score, test_attendance_score, student_attendance_score, syllabus_compliance_score, class_attendance_compliance_score, feedback_score, retention_score, conversion_score,
+      -- Percentile Scores (0-100)
+      PERCENT_RANK() OVER (ORDER BY test_performance_score ASC) * 100 AS test_performance_percentile,
+      PERCENT_RANK() OVER (ORDER BY test_attendance_score ASC) * 100 AS test_attendance_percentile,
+      PERCENT_RANK() OVER (ORDER BY student_attendance_score ASC) * 100 AS student_attendance_percentile,
+      PERCENT_RANK() OVER (ORDER BY syllabus_compliance_score ASC) * 100 AS syllabus_compliance_percentile,
+      PERCENT_RANK() OVER (ORDER BY class_attendance_compliance_score ASC) * 100 AS class_attendance_compliance_percentile,
+      PERCENT_RANK() OVER (ORDER BY feedback_score ASC) * 100 AS feedback_percentile,
+      -- Group-based (partitioned) percentile ranks for fairness
+      PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY retention_score ASC) * 100 AS retention_percentile,
+      PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY conversion_score ASC) * 100 AS conversion_percentile
+    FROM faculty_kpi_scores
+  ),
+  -- 5. Calculate the final weighted score using percentiles
   faculty_final_score AS (
     SELECT
       s.*,
       w.test_performance_w, w.test_attendance_w, w.student_attendance_w, w.syllabus_compliance_w, w.class_attendance_compliance_w, w.feedback_w, w.retention_w, w.conversion_w,
       (
-        s.test_performance_score * w.test_performance_w +
-        s.test_attendance_score * w.test_attendance_w +
-        s.student_attendance_score * w.student_attendance_w +
-        s.syllabus_compliance_score * w.syllabus_compliance_w +
-        s.class_attendance_compliance_score * w.class_attendance_compliance_w +
-        s.feedback_score * w.feedback_w +
-        s.retention_score * w.retention_w +
-        s.conversion_score * w.conversion_w
+        s.test_performance_percentile * w.test_performance_w +
+        s.test_attendance_percentile * w.test_attendance_w +
+        s.student_attendance_percentile * w.student_attendance_w +
+        s.syllabus_compliance_percentile * w.syllabus_compliance_w +
+        s.class_attendance_compliance_percentile * w.class_attendance_compliance_w +
+        s.feedback_percentile * w.feedback_w +
+        s.retention_percentile * w.retention_w +
+        s.conversion_percentile * w.conversion_w
       ) AS final_score
-    FROM faculty_kpi_scores s, kpi_weights w
+    FROM faculty_kpi_percentiles s, kpi_weights w
     WHERE s.total_students_taught > 0 -- Only score faculty who taught students
   ),
-  -- 5. Create the dimensional grain for individual row generation
+  -- 6. Create the dimensional grain for individual row generation
   valid_timetable_entries AS (
     SELECT DISTINCT
       btt.faculty_id,
@@ -744,7 +764,7 @@ WITH
     SELECT DISTINCT faculty_id, business_unit, branch_name, state, region, branch_type, branch_sub_type, stream, subject
     FROM valid_timetable_entries
   ),
-  -- 6. Create the aggregated dimension strings
+  -- 7. Create the aggregated dimension strings
   faculty_student_dimensions_agg AS (
     SELECT
       faculty_id,
@@ -759,7 +779,7 @@ WITH
     FROM valid_timetable_entries
     GROUP BY faculty_id
   )
--- 7. Final SELECT statement to join everything into the desired structure
+-- 8. Final SELECT statement to join everything into the desired structure
 SELECT
   -- HONO Dimensions
   hono.employee_id AS faculty_id,
@@ -816,6 +836,15 @@ SELECT
   scores.feedback_score,
   scores.retention_score,
   scores.conversion_score,
+  -- KPI Percentile Ranks (0-100)
+  scores.test_performance_percentile,
+  scores.test_attendance_percentile,
+  scores.student_attendance_percentile,
+  scores.syllabus_compliance_percentile,
+  scores.class_attendance_compliance_percentile,
+  scores.feedback_percentile,
+  scores.retention_percentile,
+  scores.conversion_percentile,
   -- KPI Weights
   scores.test_performance_w,
   scores.test_attendance_w,

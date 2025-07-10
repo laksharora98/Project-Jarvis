@@ -68,9 +68,9 @@ The following non-manual KPIs are in scope for V3:
 
 ### 2.4 Feedback
 
-*   **Student Feedback - CSAT (80%) / NPS (20%)**
+*   **Student Feedback (CSAT)**
     *   **Weightage:** 15%
-    *   **High-Level Definition:** Student feedback for subjects taught by the faculty (currently CSAT only, averaged across all survey questions).
+    *   **High-Level Definition:** Student feedback for subjects taught by the faculty, based on aggregated CSAT scores.
     *   **Data Source:** MyAakash
 
 ## 3. Detailed KPI Definitions & Business Logic
@@ -112,7 +112,34 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 
 ### 3.2 Non-Manual KPIs (V3 Scope)
 
-#### 3.2.1 Test Performance
+#### 3.2.1 Scoring Methodology: Percentile-Based Weighting
+To ensure fairness and a balanced impact across all Key Performance Indicators (KPIs), the V3 scorecard employs a percentile-based weighting system. Different KPIs naturally have different ranges and distributions (e.g., `Syllabus Compliance` may range from 70-100%, while `Internal Conversion` may range from 1-5%). Directly weighting these raw scores would give disproportionate influence to KPIs with wider ranges.
+
+To solve this, the following methodology is used:
+1.  **Calculate Raw KPI Score:** First, a raw score (typically on a 0-100 scale) is calculated for each faculty member for each KPI based on the specific logic defined below.
+2.  **Calculate Percentile Rank:** The raw score for each KPI is then converted into a percentile rank. This rank indicates how a faculty member performed relative to all other eligible faculty for that specific KPI. For example, a percentile rank of 95 means the faculty's raw score was higher than 95% of their peers.
+3.  **Apply Weights to Percentiles:** The final weighted score for each KPI is calculated by applying the defined weightage to its percentile rank, not its raw score.
+
+This approach ensures that each KPI contributes to the final score in proportion to its assigned importance, regardless of the natural distribution of its raw scores.
+
+#### 3.2.2 Minimum Data Thresholds for Statistical Reliability
+To ensure that KPI scores are statistically meaningful, a minimum data threshold is applied to several KPIs. A score for these KPIs will only be calculated if the amount of underlying data meets the defined threshold. If the threshold is not met, the score for that KPI will be nullified for that faculty member, and it will not contribute to their final score.
+
+*   **Test Performance:** Requires a minimum of 10 attributed student test results.
+*   **Test Attendance:** Requires a minimum of 10 assigned tests.
+*   **Student Feedback:** Requires a minimum of 5 student feedback responses.
+*   **Student Retention (Left Out & Internal Conversion):** Requires the faculty to have taught a minimum of 10 students.
+
+KPIs based on the faculty's own direct actions (Syllabus Compliance, Class Attendance Compliance) and Student Class Attendance do not have a minimum threshold.
+
+#### 3.2.3 Group-Based Normalization for Fairness
+To ensure the fairest possible comparison, certain KPIs that are heavily influenced by the student population are normalized within peer groups. This means that instead of ranking a faculty member against all other faculty in the country, they are ranked only against those in a similar context.
+
+*   **Student Retention & Internal Conversion:** The percentile ranks for these KPIs are calculated by partitioning by the faculty's stream (e.g., SOM, SOE, SOF). This ensures that a faculty's retention score is compared only with other faculty in the same stream, accounting for the inherent differences in student churn and conversion rates between streams.
+
+---
+
+#### 3.2.4 Test Performance
 *   **KRA:** Academic effectiveness
 *   **Weightage:** 10%
 *   **High-Level Definition:** Average percentage of tests in which a student performs better than the National Average in that subject.
@@ -120,7 +147,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **Calculation Logic:**
     *   For every student and subject, calculate the percentage of tests where they scored above the national average.
     *   Compute the faculty's average percentage across all students.
-    *   Convert to a score out of 100, then scale according to weightage.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Test Types Considered:**
     *   SOE: Unit Test, Term Exam, AIATS
     *   SOM: Practice Test, Term Exam, AIATS, Fortnightly Tests
@@ -129,7 +156,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
     *   Causality: Should tests given by student during or just after being taught by this faculty be included? How to determine this?
     *   Test IDs are currently determined using a subjective manual process by getting all tests conducted in scoretool, vyom. This cannot be continued.
 
-#### 3.2.2 Syllabus Compliance
+#### 3.2.5 Syllabus Compliance
 *   **KRA:** Compliance
 *   **Weightage:** 10%
 *   **High-Level Definition:** Measures whether the faculty marked the syllabus topics they covered for each lecture they delivered.
@@ -137,14 +164,11 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **Calculation Logic:**
     *   For each faculty, calculate the percentage of their delivered lectures for which they marked syllabus completion.
     *   Percentage = (Lectures with syllabus marked by faculty) / (Total lectures delivered by faculty)
-    *   Scoring:
-        *   ≥ 80% → Full marks
-        *   ≤ 50% → Zero marks
-        *   Scale linearly for percentages between 50% and 80%.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
     *   This KPI is now based on the faculty's own actions per lecture and does not require batch-level aggregation for Phase 1.
 
-#### 3.2.3 Class Attendance Compliance
+#### 3.2.6 Class Attendance Compliance
 *   **KRA:** Compliance
 *   **Weightage:** 5%
 *   **High-Level Definition:** Measures whether the faculty marked student attendance for each lecture they delivered.
@@ -152,58 +176,60 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 *   **Calculation Logic:**
     *   For each faculty, calculate the percentage of their delivered lectures for which they marked student attendance.
     *   Percentage = (Lectures with attendance marked by faculty) / (Total lectures delivered by faculty)
-    *   Scale the resulting percentage to a final score based on the 5% weightage.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
     *   This KPI is based on the faculty's own actions per lecture. It does not depend on whether a coordinator or EDP also marked attendance.
 
-#### 3.2.4 Students Class Attendance
+#### 3.2.7 Students Class Attendance
 *   **KRA:** Academic effectiveness
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per class (excluding PTM) among the students mapped to this faculty.
 *   **Data Sources:** AakashGuru, RFID, MS Teams, Crystal, Phoenix
 *   **Calculation Logic:**
     *   Average Attendance per class (excluding PTM) among the students mapped to this faculty.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
     *   Number of Lectures Marked / Total Lectures Scheduled? - Do Coordinators/EDP also mark attendance? Should attendance marked by them be included?
 
-#### 3.2.5 Test Attendance
+#### 3.2.8 Test Attendance
 *   **KRA:** Academic effectiveness
 *   **Weightage:** 5%
 *   **High-Level Definition:** Average Attendance per test among students mapped to this faculty (initially for SOE stream only).
 *   **Data Sources:** Phoenix, Vyom, Scoretool
 *   **Calculation Logic:**
     *   Average Attendance per test among students mapped to this faculty.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
     *   Only for SOE.
     *   Should causality be required similar to test performance?
     *   Scores for SOM and SOF?
 
-#### 3.2.6 Student Feedback - CSAT (80%) / NPS (20%)
+#### 3.2.9 Student Feedback (CSAT)
 *   **KRA:** Feedback
 *   **Weightage:** 15%
-*   **High-Level Definition:** Student feedback for subjects taught by the faculty (currently CSAT only, averaged across all survey questions).
+*   **High-Level Definition:** Student feedback for subjects taught by the faculty, based on aggregated CSAT scores.
 *   **Data Source:** MyAakash
 *   **Calculation Logic:**
-    *   Compute average student feedback for subjects taught by the faculty.
-    *   Feedback is taken from CSAT surveys conducted in July & October via the MyAakash App.
-    *   Scale the score as per weightage.
+    *   Compute the average student feedback rating for subjects taught by the faculty from CSAT surveys.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
-    *   Currently only CSAT is included. All questions answered across all surveys are averaged into a single score.
+    *   Currently only CSAT is included. All questions answered across all surveys are averaged into a single score. NPS is not included in V3.
     *   Should causality be included similar to test performance?
     *   Should recent surveys weigh higher?
     *   Are all questions equally relevant?
 
-#### 3.2.7 Student Retention - Left Out
+#### 3.2.10 Student Retention - Left Out
 *   **KRA:** Student Retention
 *   **Weightage:** 10%
 *   **High-Level Definition:** Percentage of students who left the program.
 *   **Data Source:** Phoenix
 *   **Calculation Logic:**
     *   Determine the percentage of students who left the program.
+    *   This raw score is then converted to a percentile rank for final weighting.
 *   **Key Considerations/Open Questions:**
     *   Currently no causality is considered. Student may have discontinued before this faculty taught them.
 
-#### 3.2.8 Student Retention - Internal Conversion
+#### 3.2.11 Student Retention - Internal Conversion
 *   **KRA:** Student Retention
 *   **Weightage:** 10%
 *   **High-Level Definition:** ICE conversion will affect scores of faculty that taught in previous course.
