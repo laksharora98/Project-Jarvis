@@ -121,7 +121,7 @@ WHERE b.business_unit IS NOT NULL
 ### 2.4. `faculty_student_mapping_vw` (Implemented)
 **Purpose:** This is the core mapping view. It identifies every student a faculty taught for a specific subject, establishing the precise `mapping_start_date` and `mapping_end_date` for each contiguous teaching block. This view is the foundation for ensuring causality.
 
-It first filters for faculty who have taught more than 25% of a student's classes for a given subject, and then calculates the contiguous teaching blocks for those eligible mappings.
+It first filters for faculty who have taught more than 25% of a student's classes for a given subject and more than 8 classes, and then calculates the contiguous teaching blocks for those eligible mappings.
 
 ```sql
 CREATE OR REPLACE VIEW faculty_student_mapping_vw AS
@@ -171,6 +171,7 @@ WITH
       (
         CAST(f.faculty_student_subject_classes AS DOUBLE) / s.total_student_subject_classes
       ) > 0.25
+      AND f.faculty_student_subject_classes > 8
   ),
   -- 4. For eligible mappings, get all class dates and calculate the gap from the previous class
   session_gaps AS (

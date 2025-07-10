@@ -262,7 +262,7 @@ The following KPIs are identified as manual and are out of scope for V3, but wil
 
 To ensure fairness and accuracy, the attribution of a student's actions (e.g., test performance, feedback) to a faculty member is strictly defined by a mapping period and a subsequent "attribution window."
 
-1.  **Faculty-Student Mapping:** A student is considered "mapped" to a faculty for a specific subject during a contiguous block of time when the faculty is actively teaching them. This is determined based on class schedules. A faculty must teach a certain percentage of classes (e.g., >25%) for a student-subject combination to establish a mapping. This mapping has a clear `start_date` and `end_date`.
+1.  **Faculty-Student Mapping:** A student is considered "mapped" to a faculty for a specific subject during a contiguous block of time when the faculty is actively teaching them. This is determined based on class schedules. A faculty must teach a certain percentage of classes (e.g., >25%) and more than 8 classes for a student-subject combination to establish a mapping. This mapping has a clear `start_date` and `end_date`.
 
 2.  **Attribution Windows:** For KPIs that have a lagging effect, a configurable "attribution window" is applied, extending from the `mapping_end_date`. An event must occur within this window to be counted towards the faculty's score.
 

@@ -8,7 +8,7 @@ This document explains the business logic for each Key Performance Indicator (KP
 
 To ensure fairness, we only measure a student's performance if they have been meaningfully taught by a faculty member. Here’s how we determine that:
 
-1.  **Meaningful Engagement:** A student is officially "mapped" to a faculty member for a specific subject only if that faculty has taught them for **more than 25%** of their total classes in that subject.
+1.  **Meaningful Engagement:** A student is officially "mapped" to a faculty member for a specific subject only if that faculty has taught them for **more than 25%** of their total classes in that subject and for **more than 8 classes**.
 2.  **Teaching Period:** This mapping creates a clear start and end date, defining the period when the faculty was actively teaching the student.
 3.  **Attribution Window:** We understand that a faculty's influence can last beyond their last class. Therefore, for certain KPIs, we include a "grace period" or **attribution window** after the teaching period ends.
 
