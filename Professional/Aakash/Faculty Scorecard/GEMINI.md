@@ -36,8 +36,8 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 ## Current Focus: V3 Implementation
 
 *   **Task**: Build the V3 Faculty Scorecard data pipeline in AWS Athena.
-*   **Status**: The project's core documentation (PRD and Technical Details) is now fully updated with the refined business logic, causality rules, and implementation plan. The foundational views (`date_params_vw`, `base_timetable_vw`, and `faculty_student_mapping_vw`) have been defined and documented.
-*   **Next Step**: Begin creating the individual KPI base views, starting with `kpi_test_performance_base_vw`.
+*   **Status**: Phase 1 of the V3 implementation is complete. All data views have been defined and finalized in `Faculty_Scorecard_V3_Implementation_Details.md`.
+*   **Next Step**: The SQL scripts are ready for execution in AWS Athena.
 
 ## Open Questions for V3
 

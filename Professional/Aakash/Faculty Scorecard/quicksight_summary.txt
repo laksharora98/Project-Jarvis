@@ -1,0 +1,10 @@
+**Faculty Scorecard KPI Summary**
+
+*   **Test Performance:** Percentage of tests where the faculty's students scored above the national average for that subject.
+*   **Student Class Attendance:** Average percentage of students who attended the faculty's classes.
+*   **Test Attendance:** Percentage of tests that were attempted by the faculty's students.
+*   **Syllabus Compliance:** Percentage of lectures for which the faculty marked syllabus completion in the system.
+*   **Class Attendance Compliance:** Percentage of lectures for which the faculty marked student attendance in the system.
+*   **Student Feedback:** Average feedback rating (from 1 to 5) received from students for the faculty's subjects.
+*   **Student Retention (Left Out):** Percentage of the faculty's students who did not discontinue their journey with Aakash.
+*   **Student Retention (Internal Conversion):** Percentage of the faculty's students who successfully enrolled in a subsequent course at Aakash.

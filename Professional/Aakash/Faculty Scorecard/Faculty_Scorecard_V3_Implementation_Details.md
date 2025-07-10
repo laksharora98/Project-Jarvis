@@ -10,7 +10,7 @@ This document captures the technical details, SQL queries, and business logic im
 To handle the lagging effect of a faculty's influence, the following attribution windows are used. These are applied from the `mapping_end_date` of a `faculty-student` mapping.
 
 *   `test_attribution_window`: **60** days
-*   `feedback_attribution_window`: **90** days
+*   `feedback_attribution_window`: **30** days
 *   `retention_attribution_window`: **90** days
 
 ## 2. Data Views & Logic
@@ -230,19 +230,622 @@ GROUP BY
   session_id
 ```
 
-### 2.5. Base KPI Views (Planned)
-A series of intermediate views will be created, one for each KPI, joining the raw data with the `faculty_student_mapping_vw` to apply the causality and attribution window logic.
-*   `kpi_test_performance_base_vw`
-*   `kpi_student_attendance_base_vw`
-*   `kpi_test_attendance_base_vw`
-*   `kpi_compliance_base_vw`
-*   `kpi_feedback_base_vw`
-*   `kpi_retention_leftout_base_vw`
-*   `kpi_retention_ice_base_vw`
+### 2.5. `unified_test_attempts_vw` (Implemented)
+**Purpose:** Creates a single, standardized view of all student test attempts by unpivoting the source data. This view serves as the foundational data for the Test Performance KPI.
 
-### 2.6. Final Scorecard View (Planned)
-**Purpose:** This view will aggregate the results from all the base KPI views to calculate the final weighted score for each faculty member.
+```sql
+CREATE OR REPLACE VIEW unified_test_attempts_vw AS
+WITH
+  t AS (
+    SELECT
+      t1.test_digit_id test_id,
+      t1.psid,
+      DATE(t1.ex_start_time) test_date,
+      t1.physics,
+      t1.chemistry,
+      t1.mathematics,
+      t1.botany,
+      t1.zoology,
+      t1.english,
+      t1.biology,
+      t1.science,
+      t1.mental_ability,
+      t1.social_science
+    FROM
+      "testplayer"."test_attempt_combined_including_missed_vw" t1
+      INNER JOIN "faculty_scorecard_laksh"."tests_considered" t2 ON t1.test_digit_id = t2.test_digit_id
+    WHERE
+      t1.is_latest_live_attempt
+  ),
+  main AS (
+    SELECT test_id, psid, test_date, 'physics' subject, physics score FROM t WHERE physics IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'chemistry' subject, chemistry score FROM t WHERE chemistry IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'mathematics' subject, mathematics score FROM t WHERE mathematics IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'botany' subject, botany score FROM t WHERE botany IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'zoology' subject, zoology score FROM t WHERE zoology IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'english' subject, english score FROM t WHERE english IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'biology' subject, biology score FROM t WHERE biology IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'science' subject, science score FROM t WHERE science IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'mental ability' subject, mental_ability score FROM t WHERE mental_ability IS NOT NULL
+    UNION ALL
+    SELECT test_id, psid, test_date, 'social science' subject, social_science score FROM t WHERE social_science IS NOT NULL
+  )
+SELECT
+  *
+FROM
+  main
+WHERE
+  test_date >= DATE '2024-04-01'
+```
 
-**Reporting Grain and Filtering Strategy:** The final output will be structured to have **one row per faculty per unique attribute value** (e.g., `subject`, `business_unit`). This means if a faculty teaches two subjects, they will have two rows in this view with identical KPI scores but different subject values. This duplication is intentional and designed to allow for easy, direct filtering in the BI tool (e.g., Quicksight).
+### 2.6. `unified_test_attendance_vw` (Implemented)
+**Purpose:** Provides a standardized view of student test attendance, indicating whether a test was attempted or missed.
 
-The view will join the calculated KPI scores back to the `eligible_faculty_hono_vw` to produce the final, filterable leaderboard.
+```sql
+CREATE OR REPLACE VIEW unified_test_attendance_vw AS
+SELECT
+  t1.test_digit_id test_id,
+  DATE(t1.acad_plan_start_date_time) test_date,
+  t1.psid,
+  t1.is_attempted
+FROM
+  "testplayer"."test_attendance_vw" t1
+  INNER JOIN "faculty_scorecard_laksh"."tests_considered" t2 ON (
+    t1.test_digit_id = t2.test_digit_id
+  )
+WHERE
+  t1.acad_plan_start_date_time >= DATE '2024-04-01'
+```
+
+### 2.7. `unified_feedback_vw` (Implemented)
+**Purpose:** Provides a standardized view of student feedback, averaging ratings per student, subject, and date.
+
+```sql
+CREATE OR REPLACE VIEW unified_feedback_vw AS
+SELECT
+  psid,
+  subject,
+  feedback_date,
+  AVG(rating) rating
+FROM
+  (
+    SELECT
+      us.psid,
+      DATE(us.created_at) feedback_date,
+      ur.rating,
+      IF(
+        lower(q.question_subject_calculated) = 'social studies',
+        'social science',
+        lower(q.question_subject_calculated)
+      ) subject
+    FROM
+      "aakash_classroom_experience"."ace_nps_survey" s
+      INNER JOIN "aakash_classroom_experience"."ace_nps_user_survey" us ON s.id = us.survey_id
+      INNER JOIN "aakash_classroom_experience"."ace_nps_user_response" ur ON us.id = ur.user_survey_id
+      INNER JOIN "aakash_classroom_experience"."nps_question_metadata" q ON s.id = q.survey_id AND ur.question_id = q.question_id
+    WHERE
+      us.submission_state = 'submitted'
+      AND q.question_type_calculated = 'Academic'
+  )
+GROUP BY
+  1,
+  2,
+  3
+```
+
+### 2.8. `unified_student_application_vw` (Implemented)
+**Purpose:** Provides a clean, reliable source of student application statuses, filtered to include only long-term, relevant courses. This is the foundational view for all retention and conversion KPIs.
+
+```sql
+CREATE OR REPLACE VIEW "unified_student_application_vw" AS 
+SELECT
+  sad.psid
+, sad.application_id
+, sad.student_name
+, sad.term_value term
+, sad.academic_career_value academic_career
+, sad.academic_group_value stream
+, IF((sad.program_action = 'DISC'), 'Left Out', IF((SUBSTRING(sad.term_value, 3, 2) > '25'), 'Active', 'Completed')) application_status
+, sad.registration_date
+, (CASE WHEN (sad.program_action = 'DISC') THEN DATE(DATE_ADD('minute', 330, sad.updated_on)) ELSE null END) left_out_date
+FROM
+  ("phoenix-enrollment_service"."student_application_details_vw" sad
+INNER JOIN "phoenix-master_setup_service"."course_master_dataset" c ON (sad.course_id = CAST(c.course_id AS int)))
+WHERE ((sad.registration_date >= DATE '2024-04-01') AND (SUBSTRING(sad.term_value, 3, 2) > '24') AND (sad.program_action IN ('MATR', 'DISC', 'APPL', 'RADM', 'BTCG', 'FOLO')) AND (sad.is_deleted = false) AND (c.crct IN ('OYCR', 'TYCR', 'THCR', 'FOUR', 'RPTR', 'CCRP')))
+```
+
+### 2.9. Base KPI Views (In Progress)
+A series of intermediate views will be created, one for each KPI. These views will join the relevant raw data with the `faculty_student_mapping_vw` to apply the causality and attribution window logic.
+
+*   `kpi_test_performance_base_vw` (Implemented)
+*   `kpi_test_attendance_base_vw` (Implemented)
+*   `kpi_student_attendance_base_vw` (Implemented)
+*   `kpi_compliance_base_vw` (Implemented)
+*   `kpi_feedback_base_vw` (Implemented)
+*   `kpi_retention_leftout_base_vw` (Implemented)
+*   `kpi_retention_ice_base_vw` (Implemented)
+
+#### 2.8.1. `kpi_test_performance_base_vw` (Implemented)
+**Purpose:** This view identifies every valid test taken by a student that can be attributed to a faculty member. It joins the student's test attempts with the faculty mapping and applies the 60-day attribution window, ensuring each test is counted only once per faculty.
+
+```sql
+CREATE OR REPLACE VIEW kpi_test_performance_base_vw AS
+WITH
+  national_avg_by_subject AS (
+    SELECT
+      test_id,
+      subject,
+      AVG(score) AS national_avg_marks
+    FROM
+      unified_test_attempts_vw
+    GROUP BY
+      test_id,
+      subject
+  )
+SELECT DISTINCT
+  fsm.faculty_id,
+  fsm.psid,
+  fsm.subject,
+  att.test_id,
+  att.test_date,
+  att.score,
+  navg.national_avg_marks,
+  CASE
+    WHEN att.score > navg.national_avg_marks THEN 1
+    ELSE 0
+  END AS is_above_national_avg
+FROM
+  faculty_student_mapping_vw AS fsm
+  INNER JOIN unified_test_attempts_vw AS att ON fsm.psid = att.psid AND fsm.subject = att.subject
+  INNER JOIN national_avg_by_subject AS navg ON att.test_id = navg.test_id AND att.subject = navg.subject
+WHERE
+  att.test_date BETWEEN fsm.mapping_start_date AND (
+    fsm.mapping_end_date + INTERVAL '60' DAY
+  )
+```
+
+#### 2.8.2. `kpi_test_attendance_base_vw` (Implemented)
+**Purpose:** This view links every test attendance record to the relevant faculty member, applying the attribution window and ensuring each attendance record is counted only once per faculty.
+
+```sql
+CREATE OR REPLACE VIEW kpi_test_attendance_base_vw AS
+SELECT DISTINCT
+  fsm.faculty_id,
+  att.psid,
+  att.test_id,
+  att.test_date,
+  att.is_attempted
+FROM
+  faculty_student_mapping_vw AS fsm
+  INNER JOIN unified_test_attendance_vw AS att ON fsm.psid = att.psid
+WHERE
+  att.test_date BETWEEN fsm.mapping_start_date AND (
+    fsm.mapping_end_date + INTERVAL '60' DAY
+  )
+```
+
+#### 2.8.3. `kpi_student_attendance_base_vw` (Implemented)
+**Purpose:** This view identifies every valid class attendance record and links it to the faculty member who taught the class.
+
+```sql
+CREATE OR REPLACE VIEW kpi_student_attendance_base_vw AS
+SELECT DISTINCT
+  btt.faculty_id,
+  btt.psid,
+  btt.subject,
+  btt.class_date,
+  btt.is_present
+FROM
+  base_timetable_vw AS btt
+  INNER JOIN faculty_student_mapping_vw AS fsm ON btt.faculty_id = fsm.faculty_id
+  AND btt.psid = fsm.psid
+  AND btt.subject = fsm.subject
+WHERE
+  -- Ensure the class date falls within one of the valid teaching blocks for that faculty, student, and subject.
+  btt.class_date BETWEEN fsm.mapping_start_date AND fsm.mapping_end_date
+```
+
+#### 2.8.4. `kpi_compliance_base_vw` (Implemented)
+**Purpose:** This view identifies every lecture delivered by a faculty member and retrieves the associated compliance flags for syllabus and attendance marking.
+
+```sql
+CREATE OR REPLACE VIEW kpi_compliance_base_vw AS
+SELECT DISTINCT
+  btt.faculty_id,
+  btt.subject,
+  btt.class_date,
+  btt.batch_time_table_id,
+  btt.is_syllabus_compliance_marked,
+  btt.is_class_attendance_marked
+FROM
+  base_timetable_vw AS btt
+  INNER JOIN faculty_student_mapping_vw AS fsm ON btt.faculty_id = fsm.faculty_id
+  AND btt.psid = fsm.psid
+  AND btt.subject = fsm.subject
+WHERE
+  -- Ensure the class date falls within one of the valid teaching blocks for that faculty, student, and subject.
+  btt.class_date BETWEEN fsm.mapping_start_date AND fsm.mapping_end_date
+```
+
+#### 2.8.5. `kpi_feedback_base_vw` (Implemented)
+**Purpose:** This view links every student feedback record to the relevant faculty member, applying the 30-day attribution window.
+
+```sql
+CREATE OR REPLACE VIEW kpi_feedback_base_vw AS
+SELECT DISTINCT
+  fsm.faculty_id,
+  f.psid,
+  f.subject,
+  f.feedback_date,
+  f.rating
+FROM
+  faculty_student_mapping_vw AS fsm
+  INNER JOIN unified_feedback_vw AS f ON fsm.psid = f.psid
+  AND fsm.subject = f.subject
+WHERE
+  -- Apply causality: feedback must be given during the mapping period
+  -- or within the 30-day attribution window after.
+  f.feedback_date BETWEEN fsm.mapping_start_date AND (
+    fsm.mapping_end_date + INTERVAL '30' DAY
+  )
+```
+
+  )
+
+#### 2.8.6. `kpi_retention_leftout_base_vw` (Implemented)
+**Purpose:** This view identifies "true" student churn events and attributes them to the relevant faculty member based on our defined business logic and attribution window. A "true" churn event is one where a student leaves a course and is not simultaneously active in any other overlapping course.
+
+```sql
+CREATE OR REPLACE VIEW kpi_retention_leftout_base_vw AS
+WITH
+  -- 1. Find "Left Out" applications where the student was not simultaneously active in another course.
+  true_left_out_events AS (
+    SELECT
+      app.psid,
+      app.term,
+      app.left_out_date
+    FROM
+      unified_student_application_vw AS app
+    WHERE
+      app.application_status = 'Left Out'
+      -- And there is NO OTHER application for the same student...
+      AND NOT EXISTS (
+        SELECT
+          1
+        FROM
+          unified_student_application_vw AS other_app
+        WHERE
+          other_app.psid = app.psid
+          -- ...that is not the one that was left...
+          AND other_app.application_id <> app.application_id
+          -- ...and was active at the time of leaving.
+          -- An application is considered active if the left_out_date falls within its academic term.
+          AND app.left_out_date BETWEEN DATE(
+            CONCAT('20', SUBSTR(other_app.term, 1, 2)),
+            '-04-01'
+          ) AND DATE(
+            CONCAT('20', SUBSTR(other_app.term, 3, 2)),
+            '-03-31'
+          )
+      )
+  )
+-- 2. Join the true "left out" events with the faculty mapping to attribute the churn.
+SELECT DISTINCT
+  fsm.faculty_id,
+  tlo.psid,
+  tlo.term,
+  tlo.left_out_date
+FROM
+  faculty_student_mapping_vw AS fsm
+  INNER JOIN true_left_out_events AS tlo ON fsm.psid = tlo.psid
+WHERE
+  -- 3. Apply the 90-day attribution window.
+  tlo.left_out_date BETWEEN fsm.mapping_start_date AND (
+    fsm.mapping_end_date + INTERVAL '90' DAY
+  )
+  -- 4. Ensure the faculty's teaching period overlaps with the academic term of the course the student left.
+  AND fsm.mapping_end_date >= DATE(
+    CONCAT('20', SUBSTR(tlo.term, 1, 2)),
+    '-04-01'
+  )
+  AND fsm.mapping_start_date <= DATE(
+    CONCAT('20', SUBSTR(tlo.term, 3, 2)),
+    '-03-31'
+  )
+```
+
+  )
+
+#### 2.8.7. `kpi_retention_ice_base_vw` (Implemented)
+**Purpose:** This view identifies successful internal conversion events (a student completing one course and enrolling in a subsequent one) and attributes this success to the faculty who taught the student in the initial course.
+
+```sql
+CREATE OR REPLACE VIEW kpi_retention_ice_base_vw AS
+WITH
+  -- 1. Identify successful internal conversions
+  conversions AS (
+    SELECT
+      initial_course.psid,
+      initial_course.term AS initial_term,
+      next_course.term AS next_term,
+      next_course.registration_date
+    FROM
+      unified_student_application_vw AS initial_course
+      INNER JOIN unified_student_application_vw AS next_course ON initial_course.psid = next_course.psid
+    WHERE
+      initial_course.application_status = 'Completed'
+      AND SUBSTR(next_course.term, 1, 2) > SUBSTR(initial_course.term, 1, 2)
+  )
+-- 2. Join conversions with faculty mapping to attribute the success
+SELECT DISTINCT
+  fsm.faculty_id,
+  c.psid,
+  c.initial_term,
+  c.next_term
+FROM
+  faculty_student_mapping_vw AS fsm
+  INNER JOIN conversions AS c ON fsm.psid = c.psid
+WHERE
+  -- 3. Apply the 90-day attribution window
+  c.registration_date BETWEEN fsm.mapping_start_date AND (
+    fsm.mapping_end_date + INTERVAL '90' DAY
+  )
+  -- 4. Ensure the faculty's teaching period overlaps with the academic term of the *initial* course.
+  --    (This is the same logic pattern as the left_out view)
+  AND fsm.mapping_end_date >= DATE(
+    CONCAT('20', SUBSTR(c.initial_term, 1, 2)),
+    '-04-01'
+  )
+  AND fsm.mapping_start_date <= DATE(
+    CONCAT('20', SUBSTR(c.initial_term, 3, 2)),
+    '-03-31'
+  )
+```
+
+### 2.9. Final Scorecard View (Implemented)
+**Purpose:** This is the culminating view that aggregates all KPI metrics, calculates a final weighted score, and structures the data for direct consumption by the BI tool. It produces one row for each unique combination of student-derived attributes for a faculty member, with scores and aggregated dimension strings repeated on each row to facilitate advanced filtering in Quicksight.
+
+```sql
+CREATE OR REPLACE VIEW final_scorecard_vw AS
+WITH
+  -- 1. Define KPI Weights from PRD
+  kpi_weights AS (
+    SELECT
+      0.10 AS test_performance_w,
+      0.05 AS test_attendance_w,
+      0.05 AS student_attendance_w,
+      0.10 AS syllabus_compliance_w,
+      0.05 AS class_attendance_compliance_w,
+      0.15 AS feedback_w,
+      0.10 AS retention_w,
+      0.10 AS conversion_w
+  ),
+  -- 2. Aggregation CTEs for each raw KPI metric
+  total_students_taught_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid) AS total_students_taught
+    FROM faculty_student_mapping_vw GROUP BY faculty_id
+  ),
+  test_performance_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid, test_id) AS total_student_tests_attributed, SUM(is_above_national_avg) AS tests_above_national_avg
+    FROM kpi_test_performance_base_vw GROUP BY faculty_id
+  ),
+  test_attendance_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid, test_id) AS total_student_tests_assigned, SUM(is_attempted) AS tests_attempted
+    FROM kpi_test_attendance_base_vw GROUP BY faculty_id
+  ),
+  student_attendance_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid, class_date) AS total_student_class_days, SUM(is_present) AS student_class_days_present
+    FROM kpi_student_attendance_base_vw GROUP BY faculty_id
+  ),
+  compliance_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT batch_time_table_id) AS total_lectures_delivered, SUM(is_syllabus_compliance_marked) AS syllabus_marked_count, SUM(is_class_attendance_marked) AS attendance_marked_count
+    FROM kpi_compliance_base_vw GROUP BY faculty_id
+  ),
+  feedback_agg AS (
+    SELECT faculty_id, AVG(rating) AS avg_feedback_rating, COUNT(DISTINCT psid, feedback_date) AS total_feedback_responses
+    FROM kpi_feedback_base_vw GROUP BY faculty_id
+  ),
+  retention_leftout_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid) AS students_left_out
+    FROM kpi_retention_leftout_base_vw GROUP BY faculty_id
+  ),
+  retention_ice_agg AS (
+    SELECT faculty_id, COUNT(DISTINCT psid) AS students_converted
+    FROM kpi_retention_ice_base_vw GROUP BY faculty_id
+  ),
+  -- 3. Join all raw metrics and calculate individual 0-100 scores
+  faculty_kpi_scores AS (
+    SELECT
+      hono.employee_id AS faculty_id,
+      -- Raw Metrics
+      st.total_students_taught,
+      tp.tests_above_national_avg,
+      tp.total_student_tests_attributed,
+      ta.tests_attempted,
+      ta.total_student_tests_assigned,
+      sa.student_class_days_present,
+      sa.total_student_class_days,
+      ca.syllabus_marked_count,
+      ca.attendance_marked_count,
+      ca.total_lectures_delivered,
+      fb.avg_feedback_rating,
+      fb.total_feedback_responses,
+      rlo.students_left_out,
+      rice.students_converted,
+      -- Individual Scores (0-100)
+      (CAST(tp.tests_above_national_avg AS DOUBLE) / NULLIF(tp.total_student_tests_attributed, 0)) * 100 AS test_performance_score,
+      (CAST(ta.tests_attempted AS DOUBLE) / NULLIF(ta.total_student_tests_assigned, 0)) * 100 AS test_attendance_score,
+      (CAST(sa.student_class_days_present AS DOUBLE) / NULLIF(sa.total_student_class_days, 0)) * 100 AS student_attendance_score,
+      (CAST(ca.syllabus_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS syllabus_compliance_score,
+      (CAST(ca.attendance_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS class_attendance_compliance_score,
+      ((fb.avg_feedback_rating - 1) / 4) * 100 AS feedback_score,
+      (CAST(st.total_students_taught - rlo.students_left_out AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 AS retention_score,
+      (CAST(rice.students_converted AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 AS conversion_score
+    FROM eligible_faculty_hono_vw AS hono
+    LEFT JOIN total_students_taught_agg AS st ON hono.employee_id = st.faculty_id
+    LEFT JOIN test_performance_agg AS tp ON hono.employee_id = tp.faculty_id
+    LEFT JOIN test_attendance_agg AS ta ON hono.employee_id = ta.faculty_id
+    LEFT JOIN student_attendance_agg AS sa ON hono.employee_id = sa.faculty_id
+    LEFT JOIN compliance_agg AS ca ON hono.employee_id = ca.faculty_id
+    LEFT JOIN feedback_agg AS fb ON hono.employee_id = fb.faculty_id
+    LEFT JOIN retention_leftout_agg AS rlo ON hono.employee_id = rlo.faculty_id
+    LEFT JOIN retention_ice_agg AS rice ON hono.employee_id = rice.faculty_id
+  ),
+  -- 4. Calculate the final weighted score
+  faculty_final_score AS (
+    SELECT
+      s.*,
+      w.test_performance_w, w.test_attendance_w, w.student_attendance_w, w.syllabus_compliance_w, w.class_attendance_compliance_w, w.feedback_w, w.retention_w, w.conversion_w,
+      (
+        s.test_performance_score * w.test_performance_w +
+        s.test_attendance_score * w.test_attendance_w +
+        s.student_attendance_score * w.student_attendance_w +
+        s.syllabus_compliance_score * w.syllabus_compliance_w +
+        s.class_attendance_compliance_score * w.class_attendance_compliance_w +
+        s.feedback_score * w.feedback_w +
+        s.retention_score * w.retention_w +
+        s.conversion_score * w.conversion_w
+      ) AS final_score
+    FROM faculty_kpi_scores s, kpi_weights w
+    WHERE s.total_students_taught > 0 -- Only score faculty who taught students
+  ),
+  -- 5. Create the dimensional grain for individual row generation
+  valid_timetable_entries AS (
+    SELECT DISTINCT
+      btt.faculty_id,
+      btt.psid,
+      btt.subject,
+      btt.class_date,
+      btt.business_unit,
+      btt.branch_name,
+      btt.state,
+      btt.region,
+      btt.branch_type,
+      btt.branch_sub_type,
+      btt.stream
+    FROM
+      base_timetable_vw AS btt
+      INNER JOIN faculty_student_mapping_vw AS fsm ON btt.faculty_id = fsm.faculty_id
+      AND btt.psid = fsm.psid
+      AND btt.subject = fsm.subject
+    WHERE
+      btt.class_date BETWEEN fsm.mapping_start_date AND fsm.mapping_end_date
+  ),
+  faculty_dimensional_grain AS (
+    SELECT DISTINCT faculty_id, business_unit, branch_name, state, region, branch_type, branch_sub_type, stream, subject
+    FROM valid_timetable_entries
+  ),
+  -- 6. Create the aggregated dimension strings
+  faculty_student_dimensions_agg AS (
+    SELECT
+      faculty_id,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT business_unit)), ', ') AS student_business_unit_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT branch_name)), ', ') AS student_branch_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT state)), ', ') AS student_state_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT region)), ', ') AS student_region_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT branch_type)), ', ') AS student_branch_type_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT branch_sub_type)), ', ') AS student_branch_sub_type_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT stream)), ', ') AS student_stream_agg,
+      ARRAY_JOIN(ARRAY_SORT(ARRAY_AGG(DISTINCT subject)), ', ') AS student_subject_agg
+    FROM valid_timetable_entries
+    GROUP BY faculty_id
+  )
+-- 7. Final SELECT statement to join everything into the desired structure
+SELECT
+  -- HONO Dimensions
+  hono.employee_id AS faculty_id,
+  hono.employee_name,
+  hono.role,
+  hono.stream AS hono_stream,
+  hono.subject AS hono_subject,
+  hono.business_unit_hono,
+  hono.business_unit AS hono_business_unit,
+  hono.business_area_desc AS hono_branch_name,
+  hono.state AS hono_state,
+  hono.region AS hono_region,
+  hono.branch_type AS hono_branch_type,
+  hono.branch_sub_type AS hono_branch_sub_type,
+  -- Student-Derived Individual Dimensions (for filtering)
+  grain.business_unit AS student_business_unit_individual,
+  grain.branch_name AS student_branch_individual,
+  grain.state AS student_state_individual,
+  grain.region AS student_region_individual,
+  grain.branch_type AS student_branch_type_individual,
+  grain.branch_sub_type AS student_branch_sub_type_individual,
+  grain.stream AS student_stream_individual,
+  grain.subject AS student_subject_individual,
+  -- Student-Derived Aggregated Dimensions (for display)
+  agg_dims.student_business_unit_agg,
+  agg_dims.student_branch_agg,
+  agg_dims.student_state_agg,
+  agg_dims.student_region_agg,
+  agg_dims.student_branch_type_agg,
+  agg_dims.student_branch_sub_type_agg,
+  agg_dims.student_stream_agg,
+  agg_dims.student_subject_agg,
+  -- Raw KPI Metrics
+  COALESCE(scores.total_students_taught, 0) AS total_students_taught,
+  COALESCE(scores.tests_above_national_avg, 0) AS tests_above_national_avg,
+  COALESCE(scores.total_student_tests_attributed, 0) AS total_student_tests_attributed,
+  COALESCE(scores.tests_attempted, 0) AS tests_attempted,
+  COALESCE(scores.total_student_tests_assigned, 0) AS total_student_tests_assigned,
+  COALESCE(scores.student_class_days_present, 0) AS student_class_days_present,
+  COALESCE(scores.total_student_class_days, 0) AS total_student_class_days,
+  COALESCE(scores.syllabus_marked_count, 0) AS syllabus_marked_count,
+  COALESCE(scores.attendance_marked_count, 0) AS attendance_marked_count,
+  COALESCE(scores.total_lectures_delivered, 0) AS total_lectures_delivered,
+  scores.avg_feedback_rating,
+  COALESCE(scores.total_feedback_responses, 0) AS total_feedback_responses,
+  COALESCE(scores.students_left_out, 0) AS students_left_out,
+  COALESCE(scores.students_converted, 0) AS students_converted,
+  -- Individual KPI Scores (0-100)
+  scores.test_performance_score,
+  scores.test_attendance_score,
+  scores.student_attendance_score,
+  scores.syllabus_compliance_score,
+  scores.class_attendance_compliance_score,
+  scores.feedback_score,
+  scores.retention_score,
+  scores.conversion_score,
+  -- KPI Weights
+  scores.test_performance_w,
+  scores.test_attendance_w,
+  scores.student_attendance_w,
+  scores.syllabus_compliance_w,
+  scores.class_attendance_compliance_w,
+  scores.feedback_w,
+  scores.retention_w,
+  scores.conversion_w,
+  -- Final Score, Rank, and Flags
+  scores.final_score,
+  CASE WHEN scores.final_score IS NOT NULL THEN 1 ELSE 0 END AS is_ranked,
+  CASE WHEN scores.faculty_id IS NOT NULL THEN 1 ELSE 0 END AS is_data_available,
+  RANK() OVER (ORDER BY scores.final_score DESC NULLS LAST) AS national_rank
+FROM eligible_faculty_hono_vw AS hono
+LEFT JOIN faculty_final_score AS scores ON hono.employee_id = scores.faculty_id
+LEFT JOIN faculty_student_dimensions_agg AS agg_dims ON hono.employee_id = agg_dims.faculty_id
+LEFT JOIN faculty_dimensional_grain AS grain ON hono.employee_id = grain.faculty_id
+```
+
+## 3. Core Business Logic for KPIs
+
+This section defines the high-level business rules that govern the calculation of key performance indicators, particularly those related to student status.
+
+
+### 3.1. Student Retention & Conversion Logic
+
+To accurately measure student churn and internal conversion, the following student-centric logic must be applied. This is crucial because a single student (`psid`) can have multiple course enrollments (`application_id`) simultaneously or sequentially.
+
+*   **Student-Centric View:** The primary unit of analysis for retention is the **student (`psid`)**, not the individual course application.
+*   **Definition of "Left Out":** A student is only considered "left out" or "churned" if **all** of their active applications are marked as discontinued. If a student has two applications for the same term (e.g., term `2426`) and only one is discontinued while the other remains active, the student is **not** considered left out.
+*   **Definition of "Internal Conversion":** A student is considered an "internal conversion" if they successfully complete a course (i.e., were not "left out") and subsequently enroll in a new course for a future term. For example, if a student was active throughout their `2325` term course and then enrolls in a `2526` term course, this represents a successful internal conversion.
+*   **Date Parameter Handling:** The logic must correctly handle all scenarios related to the scorecard's `date_params_vw`. A student's status must be evaluated based on their application statuses within the defined date range of the scorecard.
+*   **Faculty Attribution:** When attributing retention to a faculty member, the student must not have been "left out" (per the definition above) within the `retention_attribution_window` (90 days) after the faculty's `mapping_end_date`.

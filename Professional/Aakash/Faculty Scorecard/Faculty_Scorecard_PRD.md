@@ -267,7 +267,7 @@ To ensure fairness and accuracy, the attribution of a student's actions (e.g., t
 2.  **Attribution Windows:** For KPIs that have a lagging effect, a configurable "attribution window" is applied, extending from the `mapping_end_date`. An event must occur within this window to be counted towards the faculty's score.
 
     *   **Test Performance & Test Attendance:** The event (test taken) must occur during the mapping period or within a **60-day window** after the mapping ends.
-    *   **Student Feedback (CSAT):** The event (feedback given) must occur during the mapping period or within a **90-day window** after the mapping ends.
+    *   **Student Feedback (CSAT):** The event (feedback given) must occur during the mapping period or within a **30-day window** after the mapping ends.
     *   **Student Retention (Left Out):** The event (student's `left_out_date`) must occur during the mapping period or within a **90-day window** after the mapping ends.
     *   **Direct Compliance/Attendance KPIs:** For Student Class Attendance, Syllabus Compliance, and Class Attendance Compliance, the attribution window is **0 days**. The events must occur strictly within the mapping period.
     *   **Internal Conversion (ICE):** This is event-based, not time-based. It is determined by a student's re-enrollment in a subsequent course after being taught by the faculty in a course ending in the current period.
