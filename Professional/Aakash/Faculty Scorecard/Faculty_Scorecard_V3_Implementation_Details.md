@@ -709,15 +709,15 @@ WITH
       total_students_taught, tests_above_national_avg, total_student_tests_attributed, tests_attempted, total_student_tests_assigned, student_class_days_present, total_student_class_days, syllabus_marked_count, attendance_marked_count, total_lectures_delivered, avg_feedback_rating, total_feedback_responses, students_left_out, students_converted,
       test_performance_score, test_attendance_score, student_attendance_score, syllabus_compliance_score, class_attendance_compliance_score, feedback_score, retention_score, conversion_score,
       -- Percentile Scores (0-100)
-      PERCENT_RANK() OVER (ORDER BY test_performance_score ASC) * 100 AS test_performance_percentile,
-      PERCENT_RANK() OVER (ORDER BY test_attendance_score ASC) * 100 AS test_attendance_percentile,
-      PERCENT_RANK() OVER (ORDER BY student_attendance_score ASC) * 100 AS student_attendance_percentile,
-      PERCENT_RANK() OVER (ORDER BY syllabus_compliance_score ASC) * 100 AS syllabus_compliance_percentile,
-      PERCENT_RANK() OVER (ORDER BY class_attendance_compliance_score ASC) * 100 AS class_attendance_compliance_percentile,
-      PERCENT_RANK() OVER (ORDER BY feedback_score ASC) * 100 AS feedback_percentile,
+      (CASE WHEN (test_performance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY test_performance_score ASC) * 100) END) AS test_performance_percentile,
+      (CASE WHEN (test_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY test_attendance_score ASC) * 100) END) AS test_attendance_percentile,
+      (CASE WHEN (student_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY student_attendance_score ASC) * 100) END) AS student_attendance_percentile,
+      (CASE WHEN (syllabus_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY syllabus_compliance_score ASC) * 100) END) AS syllabus_compliance_percentile,
+      (CASE WHEN (class_attendance_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY class_attendance_compliance_score ASC) * 100) END) AS class_attendance_compliance_percentile,
+      (CASE WHEN (feedback_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY feedback_score ASC) * 100) END) AS feedback_percentile,
       -- Group-based (partitioned) percentile ranks for fairness
-      PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY retention_score ASC) * 100 AS retention_percentile,
-      PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY conversion_score ASC) * 100 AS conversion_percentile
+      (CASE WHEN (retention_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY retention_score ASC) * 100) END) AS retention_percentile,
+      (CASE WHEN (conversion_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY conversion_score ASC) * 100) END) AS conversion_percentile
     FROM faculty_kpi_scores
   ),
   -- 5. Calculate the final weighted score using percentiles
@@ -858,7 +858,7 @@ SELECT
   scores.final_score,
   CASE WHEN scores.final_score IS NOT NULL THEN 1 ELSE 0 END AS is_ranked,
   CASE WHEN scores.faculty_id IS NOT NULL THEN 1 ELSE 0 END AS is_data_available,
-  RANK() OVER (ORDER BY scores.final_score DESC NULLS LAST) AS national_rank
+  (CASE WHEN scores.final_score IS NULL THEN NULL ELSE DENSE_RANK() OVER (ORDER BY scores.final_score DESC) END) AS national_rank
 FROM eligible_faculty_hono_vw AS hono
 LEFT JOIN faculty_final_score AS scores ON hono.employee_id = scores.faculty_id
 LEFT JOIN faculty_student_dimensions_agg AS agg_dims ON hono.employee_id = agg_dims.faculty_id

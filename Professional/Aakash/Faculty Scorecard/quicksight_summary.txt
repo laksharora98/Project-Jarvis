@@ -1,10 +1,17 @@
-**Faculty Scorecard KPI Summary**
+**Faculty Scorecard Breakdown - Max Score - 70**
 
-*   **Test Performance:** Percentage of tests where the faculty's students scored above the national average for that subject.
-*   **Student Class Attendance:** Average percentage of students who attended the faculty's classes.
-*   **Test Attendance:** Percentage of tests that were attempted by the faculty's students.
-*   **Syllabus Compliance:** Percentage of lectures for which the faculty marked syllabus completion in the system.
-*   **Class Attendance Compliance:** Percentage of lectures for which the faculty marked student attendance in the system.
-*   **Student Feedback:** Average feedback rating (from 1 to 5) received from students for the faculty's subjects.
-*   **Student Retention (Left Out):** Percentage of the faculty's students who did not discontinue their journey with Aakash.
-*   **Student Retention (Internal Conversion):** Percentage of the faculty's students who successfully enrolled in a subsequent course at Aakash.
+This scorecard evaluates faculty performance across eight key factors from 1st April 2024 to 31st March 2025:
+
+*   **Test Performance (Max Score - 10):** Assesses student performance in tests attributed to the faculty compared to the national average.
+*   **Test Attendance (Max Score - 5):** Measures the percentage of tests attempted by students assigned to the faculty.
+*   **Student Attendance (Max Score - 5):** Tracks the percentage of classes students attended for the faculty.
+*   **Syllabus Compliance (Max Score - 10):** The faculty's diligence in marking syllabus completion for their lectures.
+*   **Class Attendance Compliance (Max Score - 5):** The faculty's diligence in marking student attendance for their classes.
+*   **Student Feedback (Max Score - 15):** The average CSAT rating received from students for the subjects taught by the faculty.
+*   **Student Retention (Max Score - 10):** Assesses the percentage of students retained under the faculty's instruction.
+*   **Student Conversion (Max Score - 10):** Measures the percentage of a faculty's students who enroll in a subsequent course.
+
+**NOTE:**
+A faculty member will not receive a score for a specific KPI if they do not meet the minimum data threshold for that metric (e.g., minimum number of attributed tests, feedback responses, or students taught). Faculty with no teaching activity recorded during the period are not ranked and are listed separately.
+
+**Link to detailed KPI definitions:** [Link to kpi_definitions_for_business_users.md]
