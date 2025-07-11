@@ -135,7 +135,7 @@ KPIs based on the faculty's own direct actions (Syllabus Compliance, Class Atten
 #### 3.2.3 Group-Based Normalization for Fairness
 To ensure the fairest possible comparison, certain KPIs that are heavily influenced by the student population are normalized within peer groups. This means that instead of ranking a faculty member against all other faculty in the country, they are ranked only against those in a similar context.
 
-*   **Student Retention & Internal Conversion:** The percentile ranks for these KPIs are calculated by partitioning by the faculty's stream (e.g., SOM, SOE, SOF). This ensures that a faculty's retention score is compared only with other faculty in the same stream, accounting for the inherent differences in student churn and conversion rates between streams.
+*   **Test Attendance, Student Retention & Internal Conversion:** The percentile ranks for these KPIs are calculated by partitioning by the faculty's stream (e.g., SOM, SOE, SOF). This ensures that a faculty's retention score is compared only with other faculty in the same stream, accounting for the inherent differences in student churn and conversion rates between streams.
 
 ---
 
@@ -311,7 +311,7 @@ To ensure fairness and accuracy, the attribution of a student's actions (e.g., t
 
 ### 5.3 Report Data Start Date
 
-*   1 Apr 2024 - 31 Mar 2025.
+*   10 Jul 2024 - 9 Jul 2025.
 
 ### 5.4 Report UI Details & Visuals (V2 Reference)
 

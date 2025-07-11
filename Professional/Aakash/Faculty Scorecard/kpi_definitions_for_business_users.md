@@ -38,9 +38,9 @@ This process ensures that a faculty's score is only impacted by the students the
 ---
 ### Comparing Apples to Apples: Fair Peer Groups
 
-For certain KPIs, such as Student Retention and Conversion, comparing faculty across different academic streams (e.g., Engineering vs. Medical) may not be appropriate due to differing student behaviors. To address this, the scorecard uses group-based ranking.
+For certain KPIs, comparing faculty across different academic streams (e.g., Engineering vs. Medical) may not be appropriate due to differing student behaviors. To address this, the scorecard uses group-based ranking.
 
-*   **For Retention and Conversion:** A faculty's percentile rank is calculated only against other faculty in the same stream (e.g., SOE vs. SOE, SOM vs. SOM).
+*   **For Test Attendance, Retention, and Conversion:** A faculty's percentile rank is calculated only against other faculty in the same stream (e.g., SOE vs. SOE, SOM vs. SOM).
 
 This makes the comparison as fair and relevant as possible.
 

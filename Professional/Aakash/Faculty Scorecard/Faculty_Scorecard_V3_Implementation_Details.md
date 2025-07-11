@@ -23,8 +23,8 @@ This section outlines the series of views that will be created to build the scor
 ```sql
 CREATE OR REPLACE VIEW date_params_vw AS
 SELECT
-  CAST('2024-04-01' AS DATE) AS start_date,
-  CAST('2025-03-31' AS DATE) AS end_date
+  CAST('2024-07-10' AS DATE) AS start_date,
+  CAST('2025-07-09' AS DATE) AS end_date
 ```
 
 ### 2.2. `base_timetable_vw` (Implemented)
@@ -664,43 +664,42 @@ WITH
   ),
   -- 3. Join all raw metrics and calculate individual 0-100 scores, applying minimum data thresholds
   faculty_kpi_scores AS (
-    SELECT
-      hono.employee_id AS faculty_id,
-      hono.stream AS hono_stream,
-      -- Raw Metrics
-      st.total_students_taught,
-      tp.tests_above_national_avg,
-      tp.total_student_tests_attributed,
-      ta.tests_attempted,
-      ta.total_student_tests_assigned,
-      sa.student_class_days_present,
-      sa.total_student_class_days,
-      ca.syllabus_marked_count,
-      ca.attendance_marked_count,
-      ca.total_lectures_delivered,
-      fb.avg_feedback_rating,
-      fb.total_feedback_responses,
-      rlo.students_left_out,
-      rice.students_converted,
-      -- Individual Scores (0-100) with Minimum Data Thresholds
-      CASE WHEN tp.total_student_tests_attributed >= 10 THEN (CAST(tp.tests_above_national_avg AS DOUBLE) / NULLIF(tp.total_student_tests_attributed, 0)) * 100 ELSE NULL END AS test_performance_score,
-      CASE WHEN ta.total_student_tests_assigned >= 10 THEN (CAST(ta.tests_attempted AS DOUBLE) / NULLIF(ta.total_student_tests_assigned, 0)) * 100 ELSE NULL END AS test_attendance_score,
-      (CAST(sa.student_class_days_present AS DOUBLE) / NULLIF(sa.total_student_class_days, 0)) * 100 AS student_attendance_score, -- No threshold for student attendance
-      (CAST(ca.syllabus_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS syllabus_compliance_score, -- No threshold for compliance
-      (CAST(ca.attendance_marked_count AS DOUBLE) / NULLIF(ca.total_lectures_delivered, 0)) * 100 AS class_attendance_compliance_score, -- No threshold for compliance
-      CASE WHEN fb.total_feedback_responses >= 5 THEN ((fb.avg_feedback_rating - 1) / 4) * 100 ELSE NULL END AS feedback_score,
-      CASE WHEN st.total_students_taught >= 10 THEN (CAST(st.total_students_taught - rlo.students_left_out AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 ELSE NULL END AS retention_score,
-      CASE WHEN st.total_students_taught >= 10 THEN (CAST(rice.students_converted AS DOUBLE) / NULLIF(st.total_students_taught, 0)) * 100 ELSE NULL END AS conversion_score
-    FROM eligible_faculty_hono_vw AS hono
-    LEFT JOIN total_students_taught_agg AS st ON hono.employee_id = st.faculty_id
-    LEFT JOIN test_performance_agg AS tp ON hono.employee_id = tp.faculty_id
-    LEFT JOIN test_attendance_agg AS ta ON hono.employee_id = ta.faculty_id
-    LEFT JOIN student_attendance_agg AS sa ON hono.employee_id = sa.faculty_id
-    LEFT JOIN compliance_agg AS ca ON hono.employee_id = ca.faculty_id
-    LEFT JOIN feedback_agg AS fb ON hono.employee_id = fb.faculty_id
-    LEFT JOIN retention_leftout_agg AS rlo ON hono.employee_id = rlo.faculty_id
-    LEFT JOIN retention_ice_agg AS rice ON hono.employee_id = rice.faculty_id
-  ),
+   SELECT
+     hono.employee_id faculty_id
+   , hono.stream hono_stream
+   , COALESCE(st.total_students_taught, 0) total_students_taught
+   , COALESCE(tp.tests_above_national_avg, 0) tests_above_national_avg
+   , COALESCE(tp.total_student_tests_attributed, 0) total_student_tests_attributed
+   , COALESCE(ta.tests_attempted, 0) tests_attempted
+   , COALESCE(ta.total_student_tests_assigned, 0) total_student_tests_assigned
+   , COALESCE(sa.student_class_days_present, 0) student_class_days_present
+   , COALESCE(sa.total_student_class_days, 0) total_student_class_days
+   , COALESCE(ca.syllabus_marked_count, 0) syllabus_marked_count
+   , COALESCE(ca.attendance_marked_count, 0) attendance_marked_count
+   , COALESCE(ca.total_lectures_delivered, 0) total_lectures_delivered
+   , fb.avg_feedback_rating
+   , COALESCE(fb.total_feedback_responses, 0) total_feedback_responses
+   , COALESCE(rlo.students_left_out, 0) students_left_out
+   , COALESCE(rice.students_converted, 0) students_converted
+   , (CASE WHEN (COALESCE(tp.total_student_tests_attributed, 0) >= 10) THEN ((CAST(COALESCE(tp.tests_above_national_avg, 0) AS DOUBLE) / NULLIF(COALESCE(tp.total_student_tests_attributed, 0), 0)) * 100) ELSE null END) test_performance_score
+   , (CASE WHEN (COALESCE(ta.total_student_tests_assigned, 0) >= 10) THEN ((CAST(COALESCE(ta.tests_attempted, 0) AS DOUBLE) / NULLIF(COALESCE(ta.total_student_tests_assigned, 0), 0)) * 100) ELSE null END) test_attendance_score
+   , ((CAST(COALESCE(sa.student_class_days_present, 0) AS DOUBLE) / NULLIF(COALESCE(sa.total_student_class_days, 0), 0)) * 100) student_attendance_score
+   , ((CAST(COALESCE(ca.syllabus_marked_count, 0) AS DOUBLE) / NULLIF(COALESCE(ca.total_lectures_delivered, 0), 0)) * 100) syllabus_compliance_score
+   , ((CAST(COALESCE(ca.attendance_marked_count, 0) AS DOUBLE) / NULLIF(COALESCE(ca.total_lectures_delivered, 0), 0)) * 100) class_attendance_compliance_score
+   , (CASE WHEN (COALESCE(fb.total_feedback_responses, 0) >= 5) THEN (((fb.avg_feedback_rating - 1) / 4) * 100) ELSE null END) feedback_score
+   , (CASE WHEN (COALESCE(st.total_students_taught, 0) >= 10) THEN ((CAST((COALESCE(st.total_students_taught, 0) - COALESCE(rlo.students_left_out, 0)) AS DOUBLE) / NULLIF(COALESCE(st.total_students_taught, 0), 0)) * 100) ELSE null END) retention_score
+   , (CASE WHEN (COALESCE(st.total_students_taught, 0) >= 10) THEN ((CAST(COALESCE(rice.students_converted, 0) AS DOUBLE) / NULLIF(COALESCE(st.total_students_taught, 0), 0)) * 100) ELSE null END) conversion_score
+   FROM
+     ((((((((eligible_faculty_hono_vw hono
+   LEFT JOIN total_students_taught_agg st ON (hono.employee_id = st.faculty_id))
+   LEFT JOIN test_performance_agg tp ON (hono.employee_id = tp.faculty_id))
+   LEFT JOIN test_attendance_agg ta ON (hono.employee_id = ta.faculty_id))
+   LEFT JOIN student_attendance_agg sa ON (hono.employee_id = sa.faculty_id))
+   LEFT JOIN compliance_agg ca ON (hono.employee_id = ca.faculty_id))
+   LEFT JOIN feedback_agg fb ON (hono.employee_id = fb.faculty_id))
+   LEFT JOIN retention_leftout_agg rlo ON (hono.employee_id = rlo.faculty_id))
+   LEFT JOIN retention_ice_agg rice ON (hono.employee_id = rice.faculty_id))
+),
   -- 4. NEW CTE: Calculate percentile rank for each KPI, partitioning by stream for retention and conversion
   faculty_kpi_percentiles AS (
     SELECT
@@ -710,7 +709,7 @@ WITH
       test_performance_score, test_attendance_score, student_attendance_score, syllabus_compliance_score, class_attendance_compliance_score, feedback_score, retention_score, conversion_score,
       -- Percentile Scores (0-100)
       (CASE WHEN (test_performance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY test_performance_score ASC) * 100) END) AS test_performance_percentile,
-      (CASE WHEN (test_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY test_attendance_score ASC) * 100) END) AS test_attendance_percentile,
+      (CASE WHEN (test_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY test_attendance_score ASC) * 100) END) AS test_attendance_percentile,
       (CASE WHEN (student_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY student_attendance_score ASC) * 100) END) AS student_attendance_percentile,
       (CASE WHEN (syllabus_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY syllabus_compliance_score ASC) * 100) END) AS syllabus_compliance_percentile,
       (CASE WHEN (class_attendance_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY class_attendance_compliance_score ASC) * 100) END) AS class_attendance_compliance_percentile,

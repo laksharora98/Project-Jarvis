@@ -32,16 +32,19 @@ The Faculty Scorecard project aims to build a comprehensive leaderboard for all 
 
 *   [Faculty_Scorecard_PRD.md](./Faculty_Scorecard_PRD.md): The official Product Requirements Document for the V3 project.
 *   [Faculty_Scorecard_V3_Implementation_Details.md](./Faculty_Scorecard_V3_Implementation_Details.md): The technical implementation log for the V3 data pipeline.
+*   [faculty_scorecard_detailed_logic.md](./faculty_scorecard_detailed_logic.md): A non-technical explainer of the complete business logic.
+*   [kpi_definitions_for_business_users.md](./kpi_definitions_for_business_users.md): A high-level guide to the KPIs for a business audience.
+*   [quicksight_summary.txt](./quicksight_summary.txt): A brief summary for the Quicksight report.
 
 ## Current Focus: V3 Implementation
 
-*   **Task**: Refine and enhance the V3 Faculty Scorecard data pipeline logic in AWS Athena.
-*   **Status**: The core SQL logic in `Faculty_Scorecard_V3_Implementation_Details.md` has been significantly enhanced to ensure fairer and more statistically robust scoring. Key improvements include:
-    *   **Percentile-Based Scoring:** Switched from raw scores to percentile ranks to normalize KPIs with different natural ranges.
-    *   **Minimum Data Thresholds:** Implemented rules to nullify KPI scores that don't have enough underlying data.
-    *   **Group-Based Normalization:** Applied stream-specific (e.g., SOM, SOE) ranking for retention and conversion KPIs to ensure fairer peer-to-peer comparisons.
-    *   All related documentation (`Faculty_Scorecard_PRD.md`, `kpi_definitions_for_business_users.md`) has been updated to reflect these changes.
-*   **Next Step**: Paused. The enhanced SQL scripts are ready for final review and execution in AWS Athena.
+*   **Task**: Document and refine the V3 Faculty Scorecard data pipeline logic.
+*   **Status**: The project's documentation has been significantly updated and aligned with the current implementation. Key logic points have been clarified:
+    *   **Stream-based ranking** is now correctly applied to Test Attendance, Retention, and Conversion KPIs.
+    *   The **scorecard period** has been updated to July 10, 2024 - July 9, 2025.
+    *   The **null score logic** has been corrected: if any KPI score is null, the faculty's final score and rank are also null, with no weight redistribution.
+    *   A new, detailed, non-technical business logic explainer has been created.
+*   **Next Step**: Paused. All documentation is up-to-date. The project is ready for the next phase of review or implementation.
 
 ## Open Questions for V3
 
