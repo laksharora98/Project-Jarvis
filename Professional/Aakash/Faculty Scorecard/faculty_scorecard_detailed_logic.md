@@ -131,8 +131,9 @@ For each KPI, we use the `faculty_student_mapping` to attribute student actions 
 This is the final step where all the individual KPI scores are combined into a single, final score and a national rank.
 
 ### Step 1: Normalizing Scores with Percentiles
-A raw score of "80%" can mean different things for different KPIs. To solve this, we convert every raw KPI score into a **percentile rank**.
-*   **Logic:** A faculty's raw score is compared to the raw scores of all other faculty. The percentile indicates the percentage of peers they outperformed. For example, a percentile rank of 92 means the faculty scored higher than 92% of other faculty for that specific KPI.
+A raw score of "80%" on one KPI might be an average performance, while on another it could be exceptional. To create a fair comparison, we convert every raw KPI score into a **percentile**.
+*   **Logic:** A faculty's percentile for a KPI represents the percentage of their peers who scored **at or below** their score. This method ensures that the top-performing faculty always receive a percentile of 100%, even if they are tied with others.
+    *   **Note on Conversion KPI:** For the 'Internal Conversion' KPI, a slightly different formula (`PERCENT_RANK`) is used. This is a deliberate choice because a large number of faculty naturally have a score of zero for this metric. The standard formula would give them all a high starting percentile (e.g., 40th). The chosen formula provides a more intuitive result by starting the scale at 0 for those with a zero score, leading to a more balanced and fair distribution for this specific KPI.
 *   **Group-Based Ranking:** For the Test Attendance, Retention, and Conversion KPIs, this percentile ranking is done *within the faculty's stream* (e.g., SOM vs. SOM, SOE vs. SOE). This ensures a fairer, apples-to-apples comparison. For all other KPIs, the ranking is done nationally.
 
 ### Step 2: Calculating the Weighted Final Score

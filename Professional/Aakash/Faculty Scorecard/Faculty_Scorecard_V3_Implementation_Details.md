@@ -704,19 +704,19 @@ WITH
   faculty_kpi_percentiles AS (
     SELECT
       faculty_id,
+      hono_stream,
       -- Raw metrics and scores to pass through
       total_students_taught, tests_above_national_avg, total_student_tests_attributed, tests_attempted, total_student_tests_assigned, student_class_days_present, total_student_class_days, syllabus_marked_count, attendance_marked_count, total_lectures_delivered, avg_feedback_rating, total_feedback_responses, students_left_out, students_converted,
       test_performance_score, test_attendance_score, student_attendance_score, syllabus_compliance_score, class_attendance_compliance_score, feedback_score, retention_score, conversion_score,
-      -- Percentile Scores (0-100)
-      (CASE WHEN (test_performance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY test_performance_score ASC) * 100) END) AS test_performance_percentile,
-      (CASE WHEN (test_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY test_attendance_score ASC) * 100) END) AS test_attendance_percentile,
-      (CASE WHEN (student_attendance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY student_attendance_score ASC) * 100) END) AS student_attendance_percentile,
-      (CASE WHEN (syllabus_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY syllabus_compliance_score ASC) * 100) END) AS syllabus_compliance_percentile,
-      (CASE WHEN (class_attendance_compliance_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY class_attendance_compliance_score ASC) * 100) END) AS class_attendance_compliance_percentile,
-      (CASE WHEN (feedback_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (ORDER BY feedback_score ASC) * 100) END) AS feedback_percentile,
-      -- Group-based (partitioned) percentile ranks for fairness
-      (CASE WHEN (retention_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY retention_score ASC) * 100) END) AS retention_percentile,
-      (CASE WHEN (conversion_score IS NULL) THEN null ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream ORDER BY conversion_score ASC) * 100) END) AS conversion_percentile
+      -- Percentile Scores (0-100), calculated ONLY for non-null scores using CUME_DIST
+      (CASE WHEN test_performance_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY CASE WHEN test_performance_score IS NOT NULL THEN 1 END ORDER BY test_performance_score ASC) * 100) END) AS test_performance_percentile,
+      (CASE WHEN test_attendance_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY hono_stream, CASE WHEN test_attendance_score IS NOT NULL THEN 1 END ORDER BY test_attendance_score ASC) * 100) END) AS test_attendance_percentile,
+      (CASE WHEN student_attendance_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY CASE WHEN student_attendance_score IS NOT NULL THEN 1 END ORDER BY student_attendance_score ASC) * 100) END) AS student_attendance_percentile,
+      (CASE WHEN syllabus_compliance_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY CASE WHEN syllabus_compliance_score IS NOT NULL THEN 1 END ORDER BY syllabus_compliance_score ASC) * 100) END) AS syllabus_compliance_percentile,
+      (CASE WHEN class_attendance_compliance_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY CASE WHEN class_attendance_compliance_score IS NOT NULL THEN 1 END ORDER BY class_attendance_compliance_score ASC) * 100) END) AS class_attendance_compliance_percentile,
+      (CASE WHEN feedback_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY CASE WHEN feedback_score IS NOT NULL THEN 1 END ORDER BY feedback_score ASC) * 100) END) AS feedback_percentile,
+      (CASE WHEN retention_score IS NULL THEN NULL ELSE (CUME_DIST() OVER (PARTITION BY hono_stream, CASE WHEN retention_score IS NOT NULL THEN 1 END ORDER BY retention_score ASC) * 100) END) AS retention_percentile,
+      (CASE WHEN conversion_score IS NULL THEN NULL ELSE (PERCENT_RANK() OVER (PARTITION BY hono_stream, CASE WHEN conversion_score IS NOT NULL THEN 1 END ORDER BY conversion_score ASC) * 100) END) AS conversion_percentile
     FROM faculty_kpi_scores
   ),
   -- 5. Calculate the final weighted score using percentiles
