@@ -7,6 +7,7 @@ This directory contains professional work related to Aakash Educational Services
 -   **Concept Kundali**: A project to analyze student performance at a concept level.
 -   **Data Platform Standards**: Centralized standards and best practices for the data platform.
 -   **Vyom Scholarship Tests**: Tracking and analysis of scholarship test data from the Vyom platform.
+-   **Communications Data Integration**: A project to consolidate all communication data (SMS, WhatsApp, Email) from third-party vendors into the data lake.
 
 ## Key Systems & Schemas
 
