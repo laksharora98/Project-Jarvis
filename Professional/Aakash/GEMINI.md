@@ -20,5 +20,6 @@ This dual-update process is crucial to ensure the **Aakash Data Wiki** evolves i
 -   **Vyom Scholarship Tests**: Tracking and analysis of scholarship test data from the Vyom platform.
 -   **Communications Data Integration**: A project to consolidate all communication data (SMS, WhatsApp, Email) from third-party vendors into the data lake.
 -   **Aakash Data Wiki**: A centralized, living knowledge base for the Aakash data ecosystem.
+-   **Customer Data Platform**: A project to develop a Customer Data Platform with Quantiphi on GCP.
 
 Gemini should proactively update these `GEMINI.md` files based on our discussions, ensuring they serve as an index to all relevant project documentation.
