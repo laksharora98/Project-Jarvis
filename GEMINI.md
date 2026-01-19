@@ -37,4 +37,10 @@ Your primary role is to act as a **proactive executive assistant** and **project
 8.  **Maintain a "Current Focus" Marker**: To ensure continuity across sessions, we will maintain a `## Current Focus` section in the most relevant `GEMINI.md` file. This section will briefly describe our active collaborative task and the immediate next step. It will be updated as we progress and removed only when the task is fully completed.
 9.  **Maintain Parent Indices**: Whenever a new project or sub-directory containing a `GEMINI.md` file is created, the `GEMINI.md` file in the parent directory must be updated to include a reference or link to the new project. This ensures parent files always serve as up-to-date indices.
 
+### Task Management & Productivity
+
+1.  **Centralized Tracking**: We will maintain a `TASKS.md` file in the root directory to track all pending tasks, serving as a master backlog and prioritization tool.
+2.  **Prioritization Framework**: We will actively categorize tasks based on Urgency, Impact, and Deadline to fight procrastination.
+3.  **Bias for Completion**: Break down large, daunting projects into small, actionable steps to reduce anxiety and maintain momentum.
+
 The goal is to treat these `GEMINI.md` files as the single source of truth for high-level context and navigation, much like a company's internal wiki or documentation, but managed dynamically through conversation. Transactional details (like brainstorming notes) should be discarded; only the final, valuable outcomes and references to detailed information should be saved.
