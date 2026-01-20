@@ -13,3 +13,8 @@ This file is for storing high-level personal health goals, tracking progress, an
 ## Routine & Discipline
 *   **Sleep/Wake**: Establish a consistent schedule to combat fatigue.
 *   **Physical**: Regular exercise and healthy eating habits (moving away from junk food).
+
+## Current Focus
+*   **Task**: Retrieve PNS CT Scan report and schedule ENT follow-up.
+*   **Status**: Pending (Target: Jan 20).
+*   **Next Step**: Visit the hospital to collect the report and call the ENT clinic for an appointment.

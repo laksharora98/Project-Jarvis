@@ -2,22 +2,38 @@
 
 This file serves as the central hub for task management, prioritization, and tracking for Project Jarvis.
 
-## ## Active Focus (High Priority - Due Today/Tomorrow)
-### 🚨 Critical / Due Today (Jan 19)
+## ## Today's Roadmap (Jan 20)
+
+### 1. 📥 Inbox & Discovery (Start Here)
+*   [ ] **[Work]** Process Inbox (Identify new tasks)
+
+### 2. 🚨 Critical New Task
+*   [ ] **[Work]** Data gathering related to tests (Must be done today)
+
+### 3. ✈️ Wedding Admin (Tickets Confirmed)
+*   [ ] **[Admin]** File tickets in Google Drive
+*   [ ] **[Admin]** Update Google Calendar with trip details
+*   [ ] **[Admin]** Apply for leave on HR Portal
+
+### 4. 🧹 Clearing the Deck (Overdue Work)
 *   [ ] **[Work]** UAT and Release: PSERP Course Dump Report
 *   [ ] **[Work]** UAT and Release: Outstanding Report
 *   [ ] **[Work]** Stock Report: Minor enhancements
 *   [ ] **[Work]** Get updates: Webengage Data Validation & Hint Verification
-*   [ ] **[Work]** Process Inbox
-*   [ ] **[Wedding]** Confirm ticket with friend (Ashoknagar trip)
-*   [ ] **[Wedding]** Coordinate return trip (Jan 30) with group
 
-### 🔥 Urgent / Due Tomorrow (Jan 20)
+### 5. 🏗️ Strategic Focus (Deep Work)
+*   [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion
+
+### 6. ⏳ Stretch Goals (If Time Permits)
 *   [ ] **[Work]** PSERP Shutdown: Complete Planning & Schedule Meetings
-*   [ ] **[Work]** CDP: Finalize Phase 1 PRD (Target: Jan 20-21)
-*   [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion (Target: Jan 20-21)
+*   [ ] **[Work]** CDP: Finalize Phase 1 PRD
+
+## ## Deprioritized / Postponed (For Later)
 *   [ ] **[Health]** Pick up PNS CT Scan report & Schedule ENT follow-up
-*   [ ] **[Admin]** Submit Investment Proofs (Deadline: Jan 26 - Start gathering)
+*   [ ] **[Admin]** Submit Investment Proofs (Deadline: Jan 26)
+*   [ ] **[Finance]** Unlock SBI Account
+*   [ ] **[Relationships]** Respond to intimate email from colleague
+*   [ ] **[Relationships]** Reach out to friends
 
 ## ## Backlog (Categorized)
 
@@ -44,15 +60,12 @@ This file serves as the central hub for task management, prioritization, and tra
 
 ### Personal
 #### Relationships (The Dossier)
-*   [ ] **[Urgent]** Respond to intimate email from colleague
-*   [ ] **[Urgent]** Reach out to friends with "a lot going on" (Next 2-3 days)
 *   [ ] **[Wedding Feb]** Start planning for February wedding
 *   [ ] Create "Dossier" structure (Contacts, Last Contacted, Notes)
 *   [ ] Schedule weekly social media review (Insta, Whatsapp, LinkedIn)
 *   [ ] Plan offline meetups
 
 #### Finance
-*   [ ] **[Critical]** Unlock SBI Account (Locked > 1 year, 2-3L balance)
 *   [ ] Plan Budget, Investments, Insurance, Taxes
 
 #### Health & Lifestyle

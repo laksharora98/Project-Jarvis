@@ -9,3 +9,8 @@ This file contains high-level personal financial goals, principles, and importan
 ## Strategic Goals
 *   **Financial Planning**: Establish a structured approach to Budgeting, Investments, Insurance, and Taxes (currently unplanned).
 *   **Wealth Creation**: Align financial habits with the goal of "getting wealthy quick" (supporting the Career/Startup goal).
+
+## Current Focus
+*   **Task**: Gather and submit Investment Proofs to HR.
+*   **Status**: Planning phase (Deadline: Jan 26).
+*   **Next Step**: Identify all required proofs (Rent receipts, 80C, etc.) and start collecting them today.

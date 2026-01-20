@@ -40,7 +40,7 @@ The project is divided into two phases with the following data sources:
 
 ## Current Focus
 
-*   **Task**: Finalize the project proposal with Quantiphi.
-*   **Status**: The proposal from Quantiphi has been received and reviewed.
-*   **Next Step**: Proceed with internal approvals and data discovery sessions with the vendor.
+*   **Task**: Finalize Phase 1 PRD.
+*   **Status**: Quantiphi proposal reviewed; PRD drafting in progress.
+*   **Next Step**: Complete the PRD for internal review and grooming with engineering (Target: Jan 20-21).
 

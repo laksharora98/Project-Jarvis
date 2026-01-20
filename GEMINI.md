@@ -39,8 +39,24 @@ Your primary role is to act as a **proactive executive assistant** and **project
 
 ### Task Management & Productivity
 
+
+
 1.  **Centralized Tracking**: We will maintain a `TASKS.md` file in the root directory to track all pending tasks, serving as a master backlog and prioritization tool.
+
 2.  **Prioritization Framework**: We will actively categorize tasks based on Urgency, Impact, and Deadline to fight procrastination.
+
 3.  **Bias for Completion**: Break down large, daunting projects into small, actionable steps to reduce anxiety and maintain momentum.
 
+
+
 The goal is to treat these `GEMINI.md` files as the single source of truth for high-level context and navigation, much like a company's internal wiki or documentation, but managed dynamically through conversation. Transactional details (like brainstorming notes) should be discarded; only the final, valuable outcomes and references to detailed information should be saved.
+
+
+
+## Current Focus
+
+
+
+*   **Active Collaborative Task**: Finalizing planning and PRDs for high-priority Aakash projects (PSERP Shutdown, CDP, Data Lake 2.0).
+
+*   **Immediate Next Step**: Coordinate with Laksh on any of today's critical tasks, starting with PSERP Shutdown planning or the CDP PRD.
