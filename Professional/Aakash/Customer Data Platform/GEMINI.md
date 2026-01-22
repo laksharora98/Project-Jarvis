@@ -1,12 +1,10 @@
 # Customer Data Platform (CDP)
 
-# Customer Data Platform (CDP)
-
 ## Project Overview
 
 This project focuses on building a proprietary Customer Data Platform (CDP) internally at Aakash. The primary goal is to create a unified, 360-degree view of the customer by consolidating data from the **Superleap CRM** into a "Golden Record" (User Profile) and an Event Stream.
 
-**CRITICAL WARNING:** The PDF documentation in this folder (PRDs, Catalogs, Use Cases) contains known mistakes and inconsistencies. **Do not treat these files as the source of truth.** All logic and requirements drawn from them must be explicitly discussed and verified with Laksh before being finalized.
+**CRITICAL WARNING:** The `draft1/` folder contains initial PDF documentation (PRDs, Catalogs, Use Cases) which has known mistakes and inconsistencies. **Do not treat files in `draft1/` as completely true.** The PRD we are working on is the **`CDP_Phase_1_PRD.md`** file in the root of this directory.
 
 This centralized data will power:
 1.  **Marketing Automation:** Syncing to tools like MoEngage/WebEngage.
@@ -15,22 +13,20 @@ This centralized data will power:
 ## Phase 1 Scope (Internal Build)
 
 *   **Source:** Superleap CRM (Athena: `superleap-prod`).
-*   **Core Entities:** Leads, Product/Scholarship Opportunities, Call Logs.
+*   **Core Entities:** Leads, Product/Scholarship Opportunities, Call Logs, Call Dispositions.
 *   **Output:**
     *   **Silver Layer:** Normalized Dimension/Fact tables.
     *   **Gold Layer:**
         *   `cdp_dim_user`: Wide table with aggregated user attributes.
-        *   `cdp_fact_events`: Event stream containing **only** `call_log` and `call_disposition` events.
+        *   `cdp_fact_events`: Event stream containing `call_log` and `call_disposition` events.
 
 ## Current Focus
 
-*   **Task**: Define granular business logic for the Gold Layer.
-*   **Status**: High-level PRD (`CDP_Phase_1_PRD.md`) created. Architecture confirmed.
-*   **Next Step**:
-    *   Resolve **Identity Resolution** logic (Student vs. Lead, Parent vs. Student Mobile).
-    *   Define detailed schemas for Silver Layer tables.
+*   **Task**: PRD draft completed.
+*   **Status**: The [CDP_Phase_1_PRD.md](./CDP_Phase_1_PRD.md) high level is ready.
+*   **Next Step**: Review the PRD with a fine tooth comb. make sure all relevant fields as required by draft1 documents are also in the final PRD.
 
-## Key Documents
-*   [CDP_Phase_1_PRD.md](./CDP_Phase_1_PRD.md) - Official PRD.
-
-
+## Directory Structure
+*   `CDP_Phase_1_PRD.md`: The draft PRD to be finalised after review.
+*   `draft1/`: Initial PDF documentation (Contains known errors/inconsistencies).
+*   `_archive/`: Old proposals and superseded documents.
