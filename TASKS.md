@@ -4,29 +4,22 @@ This file serves as the central hub for task management, prioritization, and tra
 
 ## ## Today's Roadmap (Jan 20)
 
-### 1. 📥 Inbox & Discovery (Start Here)
-*   [ ] **[Work]** Process Inbox (Identify new tasks)
+### 1. ✅ Done
+*   [x] **[Work]** Process Inbox
+*   [x] **[Work]** UAT and Release: PSERP Course Dump Report
+*   [x] **[Work]** Get updates: Webengage Data Validation & Hint Verification
 
-### 2. 🚨 Critical New Task
-*   [ ] **[Work]** Data gathering related to tests (Must be done today)
-
-### 3. ✈️ Wedding Admin (Tickets Confirmed)
-*   [ ] **[Admin]** File tickets in Google Drive
-*   [ ] **[Admin]** Update Google Calendar with trip details
-*   [ ] **[Admin]** Apply for leave on HR Portal
-
-### 4. 🧹 Clearing the Deck (Overdue Work)
-*   [ ] **[Work]** UAT and Release: PSERP Course Dump Report
-*   [ ] **[Work]** UAT and Release: Outstanding Report
-*   [ ] **[Work]** Stock Report: Minor enhancements
-*   [ ] **[Work]** Get updates: Webengage Data Validation & Hint Verification
-
-### 5. 🏗️ Strategic Focus (Deep Work)
-*   [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion
-
-### 6. ⏳ Stretch Goals (If Time Permits)
-*   [ ] **[Work]** PSERP Shutdown: Complete Planning & Schedule Meetings
-*   [ ] **[Work]** CDP: Finalize Phase 1 PRD
+### 2. 🔥 Active Priority Queue
+1.  [ ] **[Work]** UAT and Release: Outstanding Report
+2.  [ ] **[Work]** Stock Report: Minor enhancements
+3.  [ ] **[Work]** Data gathering related to tests
+4.  **[Admin]** Wedding Tasks
+    *   [ ] File tickets in Google Drive
+    *   [ ] Update Google Calendar with trip details
+    *   [ ] Apply for leave on HR Portal
+5.  [ ] **[Work]** PSERP Shutdown: Complete Planning & Schedule Meetings
+6.  [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion
+7.  [ ] **[Work]** CDP: Finalize Phase 1 PRD
 
 ## ## Deprioritized / Postponed (For Later)
 *   [ ] **[Health]** Pick up PNS CT Scan report & Schedule ENT follow-up
