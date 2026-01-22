@@ -19,7 +19,7 @@ This file serves as the central hub for task management, prioritization, and tra
     *   [ ] Apply for leave on HR Portal
 5.  [ ] **[Work]** PSERP Shutdown: Complete Planning & Schedule Meetings
 6.  [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion
-7.  [ ] **[Work]** CDP: Finalize Phase 1 PRD
+7.  [ ] **[Work]** CDP: Define Identity Resolution & Silver Schema (Verify PDF logic first!)
 
 ## ## Deprioritized / Postponed (For Later)
 *   [ ] **[Health]** Pick up PNS CT Scan report & Schedule ENT follow-up
