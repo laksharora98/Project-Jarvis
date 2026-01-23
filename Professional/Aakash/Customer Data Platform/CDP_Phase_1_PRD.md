@@ -44,6 +44,7 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `father_name` | Father's Full Name. | Trim, Title Case. | `superleap_prod.lead.father_name_c` |
 | `mother_name` | Mother's Full Name. | Trim, Title Case. | `superleap_prod.lead.mother_name_c` |
 | `primary_mobile_number` | Primary Contact. | Clean non-numeric chars. | `superleap_prod.lead.primary_mobile_number__c` |
+| `principle_mobile_number` | Principle Contact. | Clean non-numeric chars. | `superleap_prod.lead.aesl_principal_mobile_number_c` |
 | `email` | Email Address. | Lowercase, Trim. | `superleap_prod.lead.email` |
 | `dob` | Date of Birth. | Cast to Date (`yyyy-MM-dd`). | `superleap_prod.lead.date_of_birth_c` |
 | `gender` | Gender. | Standardize values. | `superleap_prod.lead.gender_c` |
@@ -51,9 +52,32 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `city` | Student City. | Title Case. | `superleap_prod.lead.city_c` |
 | `state` | Student State. | Title Case. | `superleap_prod.lead.state_c` |
 | `pincode` | Postal Code. | Cast to string. | `superleap_prod.lead.pincode_c` |
+| `class_studying` | Class Studying In. | - | `superleap_prod.lead.aesl_class_studying_in__c` |
+| `stream` | Stream. | - | `superleap_prod.lead.aesl_stream_c` |
 | `lead_source` | Source of Lead. | - | `superleap_prod.lead.source_c` |
 | `lead_stage` | CRM Stage. | - | `superleap_prod.lead.stage` |
 | `school_id` | Foreign Key to School. | - | `superleap_prod.lead.school_name_c` |
+| `utm_campaign` | UTM Campaign. | - | `superleap_prod.lead.aesl_utm_campaign_c` |
+| `utm_source` | UTM Source. | - | `superleap_prod.lead.aesl_utm_source_c` |
+| `utm_medium` | UTM Medium. | - | `superleap_prod.lead.aesl_utm_medium_c` |
+| `utm_id` | UTM ID. | - | `superleap_prod.lead.aesl_utmid_c` |
+| `psid` | PeopleSoft ID. | - | `superleap_prod.lead.aesl_ps_id_c` |
+| `superleap_origin` | Origin System. | - | `superleap_prod.lead.superleap_origin` |
+| `lms_created_by` | LMS Creator. | - | `superleap_prod.lead.aesl_lms_created_by_c` |
+| `ps_created_by` | PS Creator. | - | `superleap_prod.lead.aesl_ps_created_by_c` |
+| `created_by_user` | Creator User ID. | - | `superleap_prod.lead.created_by` |
+| `whatsapp_opt_in` | WA Opt-in. | Boolean. | `superleap_prod.lead.aesl_whatsapp_opt_in_c` |
+| `otp_verified` | OTP Verified. | Boolean. | `superleap_prod.lead.aesl_otp_verified__c` |
+| `is_class_topper` | Class Topper. | Boolean. | `superleap_prod.lead.aesl_class_topper__c` |
+| `no_of_call_connected` | Calls Connected. | Int. | `superleap_prod.lead.no_of_calls_connected` |
+| `no_of_branch_visit` | Branch Visits. | Int. | `superleap_prod.lead.no_of_branch_visit` |
+| `no_of_home_visit` | Home Visits. | Int. | `superleap_prod.lead.no_of_home_visit` |
+| `first_conversation_remark` | First Remark. | - | `superleap_prod.lead.first_conversation_remarks` |
+| `last_conversation_remark` | Last Remark. | - | `superleap_prod.lead.last_conversation_remarks` |
+| `first_branch_visit_date` | First Branch Visit. | Timestamp. | `superleap_prod.lead.first_branch_visit_date` |
+| `last_branch_visit_date` | Last Branch Visit. | Timestamp. | `superleap_prod.lead.last_branch_visit_date` |
+| `first_home_visit_date` | First Home Visit. | Timestamp. | `superleap_prod.lead.first_home_visit_date` |
+| `last_home_visit_date` | Last Home Visit. | Timestamp. | `superleap_prod.lead.last_home_visit_date` |
 | `created_at` | Record Creation Time. | Cast to Timestamp. | `superleap_prod.lead.created_at` |
 | `updated_at` | Record Update Time. | Cast to Timestamp. | `superleap_prod.lead.updated_at` |
 
@@ -67,7 +91,47 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `school_city` | City of School. | - | `superleap_prod.school.city_c` |
 | `exam_board` | Board (CBSE/ICSE). | - | `superleap_prod.school.board_c` |
 
-#### Table 3: `crm_fact_product_opportunity`
+#### Table 3: `crm_dim_branch`
+*Reference table for Aakash branches.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `branch_id` | PK. | - | `superleap_prod.branch.id` |
+| `branch_name` | Name of Branch. | - | `superleap_prod.branch.name` |
+| `branch_code` | Branch Code (e.g., DEL-01). | - | `superleap_prod.branch.branch_code` |
+| `branch_city` | City of Branch. | - | `superleap_prod.branch.branch_city` |
+| `branch_zone` | Zone (North/South/etc). | - | `superleap_prod.branch.branch_zone` |
+
+#### Table 4: `crm_dim_city`
+*Master list of cities.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `city_id` | PK. | - | `superleap_prod.city.id` |
+| `city_name` | Name of City. | Title Case. | `superleap_prod.city.name` |
+| `city_code` | Abbreviation. | - | `superleap_prod.city.code` |
+| `state_id` | FK to State. | - | `superleap_prod.city.state_id` |
+
+#### Table 5: `crm_dim_state`
+*Master list of states.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `state_id` | PK. | - | `superleap_prod.state.id` |
+| `state_name` | Name of State. | Title Case. | `superleap_prod.state.name` |
+
+#### Table 6: `crm_dim_course`
+*Master catalog of Aakash courses.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `course_id` | PK. | - | `superleap_prod.course.id` |
+| `course_code` | Unique Course Code. | - | `superleap_prod.course.code` |
+| `course_name` | Full Course Name. | - | `superleap_prod.course.name` |
+| `stream` | Stream (Eng/Med/Fdn). | - | `superleap_prod.course.stream` |
+| `class_level` | Target Class. | - | `superleap_prod.course.class` |
+
+#### Table 7: `crm_fact_product_opportunity`
 *Business pipeline data (Potential or Converted Deals).*
 
 | Field Name | Description | Logic / Transformation | Bronze Source |
@@ -82,7 +146,7 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `amount` | Deal Value. | Cast to Decimal. | `superleap_prod.opportunity.amount` |
 | `created_at` | Created Date. | - | `superleap_prod.opportunity.created_at` |
 
-#### Table 4: `crm_fact_scholarship_opportunity`
+#### Table 8: `crm_fact_scholarship_opportunity`
 *Exam Registrations (ANTHE, IAT, iACST).*
 
 | Field Name | Description | Logic / Transformation | Bronze Source |
@@ -93,11 +157,31 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `term` | Academic Term. | - | `superleap_prod.scholarship_opportunity.term_c` |
 | `registration_date` | Date of Registration. | - | `superleap_prod.scholarship_opportunity.created_at` |
 | `exam_date` | Date of Exam. | - | `superleap_prod.scholarship_opportunity.exam_date_c` |
+| `original_examination_date` | Original Exam Date. | - | `superleap_prod.scholarship_opportunity.aesl_original_exam_date__c` |
+| `exam_center` | Exam Center. | - | `superleap_prod.scholarship_opportunity.aesl_exam_center__c` |
+| `exam_slot` | Exam Slot. | - | `superleap_prod.scholarship_opportunity.aesl_exam_slot__c` |
+| `exam_mode` | Exam Mode. | - | `superleap_prod.scholarship_opportunity.aesl_exam_mode__c` |
 | `is_attempted` | Did they take it? | Boolean. | `superleap_prod.scholarship_opportunity.is_attempted_c` |
 | `scholarship_percent` | % Scholarship Won. | Decimal. | `superleap_prod.scholarship_opportunity.scholarship_percentage_c` |
 | `roll_number` | Admit Card Roll No. | - | `superleap_prod.scholarship_opportunity.roll_number_c` |
+| `class_studying_in` | Class at Registration. | - | `superleap_prod.scholarship_opportunity.aesl_class_studying_in__c` |
+| `stream` | Stream at Registration. | - | `superleap_prod.scholarship_opportunity.aesl_stream__c` |
+| `payment_date` | Payment Date. | - | `superleap_prod.scholarship_opportunity.aesl_payment_date__c` |
+| `payment_link` | Payment Link. | - | `superleap_prod.scholarship_opportunity.aesl_payment_url__c` |
+| `transaction_status` | Payment Status. | - | `superleap_prod.scholarship_opportunity.aesl_transaction_status__c` |
+| `transaction_amount` | Payment Amount. | Decimal. | `superleap_prod.scholarship_opportunity.aesl_transaction_amount__c` |
+| `mock_payment_date` | Mock Payment Date. | - | `superleap_prod.scholarship_opportunity.aesl_payment_date_m__c` |
+| `mock_transaction_amount` | Mock Amount. | Decimal. | `superleap_prod.scholarship_opportunity.aesl_transaction_amount_m__c` |
+| `utm_campaign` | UTM Campaign. | - | `superleap_prod.scholarship_opportunity.aesl_utm_campaign_c` |
+| `utm_medium` | UTM Medium. | - | `superleap_prod.scholarship_opportunity.aesl_utm_medium_c` |
+| `utm_id` | UTM ID. | - | `superleap_prod.scholarship_opportunity.aesl_utmid_c` |
+| `campaign_id` | Campaign ID. | - | `superleap_prod.scholarship_opportunity.campaign_id` |
+| `campaign_name` | Campaign Name. | - | `superleap_prod.scholarship_opportunity.campaign_name` |
+| `is_mock_taken` | Mock Taken? | Boolean. | `superleap_prod.scholarship_opportunity.aesl_is_mock_c` |
+| `is_sample_taken` | Sample Taken? | Boolean. | `superleap_prod.scholarship_opportunity.aesl_is_sample_taken` |
+| `updated_at` | Record Update Time. | - | `superleap_prod.scholarship_opportunity.updated_at` |
 
-#### Table 5: `crm_fact_call_log`
+#### Table 9: `crm_fact_call_log`
 *System-generated telephony logs.*
 
 | Field Name | Description | Logic / Transformation | Bronze Source |
@@ -109,7 +193,7 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `call_time` | Start Time. | Timestamp. | `superleap_prod.call_log.start_time` |
 | `agent_id` | FK to Agent. | - | `superleap_prod.call_log.owner_id` |
 
-#### Table 6: `crm_fact_call_disposition`
+#### Table 10: `crm_fact_call_disposition`
 *Agent-submitted interaction forms.*
 
 | Field Name | Description | Logic / Transformation | Bronze Source |
@@ -120,6 +204,30 @@ We are building a proprietary, internal Customer Data Platform (CDP) to serve as
 | `sub_disposition` | Detailed Reason. | - | `superleap_prod.task.sub_disposition_c` |
 | `remarks` | Agent Notes. | Clean newlines. | `superleap_prod.task.description` |
 | `interaction_date` | Submission Time. | Timestamp. | `superleap_prod.task.created_at` |
+
+#### Table 11: `crm_fact_exam_attendance`
+*Tracking of student attendance for scholarship tests.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `attendance_id` | PK. | - | `superleap_prod.exam_attendance.id` |
+| `scholarship_opp_id` | FK to Opp. | - | `superleap_prod.exam_attendance.opportunity_id` |
+| `test_type` | Mock / Main / Sample. | - | `superleap_prod.exam_attendance.test_type_c` |
+| `action` | Status (Started/Submitted). | - | `superleap_prod.exam_attendance.action` |
+| `action_time` | Timestamp of action. | Timestamp. | `superleap_prod.exam_attendance.action_date_time` |
+
+#### Table 12: `crm_fact_exam_result`
+*Detailed exam results and rankings.*
+
+| Field Name | Description | Logic / Transformation | Bronze Source |
+| :--- | :--- | :--- | :--- |
+| `result_id` | PK. | - | `superleap_prod.exam_result.id` |
+| `scholarship_opp_id` | FK to Opp. | - | `superleap_prod.exam_result.opportunity_id` |
+| `percentage` | Score Percentage. | Decimal. | `superleap_prod.exam_result.percentage` |
+| `eligible_scholarship` | Final Scholarship %. | Decimal. | `superleap_prod.exam_result.eligible_scholarship` |
+| `national_rank` | All India Rank. | Int. | `superleap_prod.exam_result.national_rank` |
+| `state_rank` | State Rank. | Int. | `superleap_prod.exam_result.state_rank` |
+| `city_rank` | City Rank. | Int. | `superleap_prod.exam_result.city_rank` |
 
 ### 3.3 Gold Layer (The CDP Output)
 

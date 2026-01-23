@@ -6,6 +6,9 @@ This project focuses on building a proprietary Customer Data Platform (CDP) inte
 
 **CRITICAL WARNING:** The `draft1/` folder contains initial PDF documentation (PRDs, Catalogs, Use Cases) which has known mistakes and inconsistencies. **Do not treat files in `draft1/` as completely true.** The PRD we are working on is the **`CDP_Phase_1_PRD.md`** file in the root of this directory.
 
+### Known Inaccuracies in `draft1`
+*   **Mobile Numbers:** The `draft1` documents describe complex logic for `student_msg_no`, `father_msg_no`, and `mother_msg_no`. **Decision:** We do not need this. We will use `primary_mobile_number` as the single source of truth for communication.
+
 This centralized data will power:
 1.  **Marketing Automation:** Syncing to tools like MoEngage/WebEngage.
 2.  **Analytics:** Powering QuickSight dashboards and ad-hoc queries.
