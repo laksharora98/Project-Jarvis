@@ -1,0 +1,23 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Gemini CLI
+.gemini/
+
+# Dependency folders (just in case they appear in root)
+node_modules/
+jspm_packages/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

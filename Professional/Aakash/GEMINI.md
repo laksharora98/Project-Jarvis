@@ -12,6 +12,7 @@ Your primary role is to act as a proactive knowledge manager. When we discuss an
 2.  **Update the Central Wiki**: Simultaneously, update the central `Aakash Data Wiki`. This includes adding or refining entries in the `Glossary.md`, documenting data assets (`Tables/`, `Glue Jobs/`), and describing business logic (`Business Domains/`).
 
 ## Active Projects (High Priority)
+*   **[Aakash Battleground](./Aakash%20Battleground/GEMINI.md) (Hackathon)**: A competitive, topic-wise quiz battleground prototype with real-time 1v1 battles.
 *   **[PSERP Shutdown](./PSERP%20Shutdown/GEMINI.md) (Critical)**: Migration of Finance modules and Analytics datasets from Old ERP (PeopleSoft) to New ERP (Phoenix) by March 31.
 *   **Customer Data Platform (CDP)**: Developing Phase 1 PRD and roadmap for the new CDP (with Quantiphi on GCP).
 *   **[Data Lake 2.0](./Data%20Lake%202.0/GEMINI.md)**: Implementation of Medallion Architecture for the data platform.
