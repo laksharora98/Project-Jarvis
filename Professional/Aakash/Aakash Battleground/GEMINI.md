@@ -62,7 +62,7 @@ We are optimizing for the **"Magic Moment"**: *Seeing your opponent's action imp
 
 ## Remaining Issues (Backlog)
 
-1.  **Security (Client Trust)**: The server currently trusts the client to say if an answer was correct. A hacked client could always send "Correct". (Requires server-side validation).
+1.  **Security (Time Trust)**: The server validates the *answer* correctness (Fixed in v1.1), but it still trusts the client's `timeRemaining` for score calculation. A hacked client could always send "10 seconds left". (Requires server-side timestamping).
 
 ## Future Roadmap (Enhancements)
 

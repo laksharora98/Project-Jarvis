@@ -3,7 +3,9 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, Platform, Keyboard
 import io from 'socket.io-client';
 
 // 1. UPDATE THIS with your current Ngrok URL from the terminal
-const NGROK_URL = 'https://b316f45af2fb.ngrok-free.app'; 
+// WARNING: Ngrok URLs expire after 2 hours (Free Tier) or on restart.
+// Run 'ngrok http 3000' and copy the new HTTPS URL here.
+const NGROK_URL = 'https://4a84567b6402.ngrok-free.app'; 
 
 // 2. Automatic Selection Logic
 const SOCKET_URL = (Platform.OS === 'web' && window.location.hostname === 'localhost') 
