@@ -1,17 +1,17 @@
 # Global Task List & Backlog
 
-*Last Updated: Jan 28, 2026*
+*Last Updated: Jan 28, 2026 (On the train)*
 
-## 🚨 IMMEDIATE ACTIONS (Jan 28 - Before Leaving)
-*   [ ] **[Logistics]** **Apply for Leave**: Jan 29-30 (Reason: Wedding).
-*   [ ] **[Logistics]** **Office Exit**: Leave by 6:30 PM. Train departs H. Nizamuddin @ 10:50 PM.
-*   [ ] **[Handoff]** **Intern Task**: Ensure clear backlog/instructions for your absence (Wed-Mon) regarding QuickSight User Management (PSERP).
-*   [ ] **[Handoff]** **Hackathon**: Share your existing Battleground code with the team for the Jan 30-31 Internal Hackathon.
-*   [ ] **[Work]** **Hotfix**: Vyom <> Scoretool Data Sync (Stop the bleeding immediately).
+## 🚨 Current Focus & Follow-ups
+*   [ ] **[Handoff]** **Intern Task (QuickSight/PSERP)**: Follow up on Feb 2. (Requirements doc reviewed; Intern to add email campaign/reminders section and prepare 'missing users' list).
+*   [ ] **[Work]** **Hotfix**: Vyom <> Scoretool Data Sync (Status: Resync triggered for ~75k attempts. Monitor completion).
 
 ## 🔥 High Priority Fires (Data Sync Issues)
 *   [ ] **Superleap Connectors**: Get ETA from Superleap team (failing for ~3 days). Update Business stakeholders.
-*   [ ] **Vyom <> Scoretool**: Plan re-architecture (Fetch Source 2 data directly from Source 1).
+*   [ ] **Vyom Direct Feed (Feb 2)**:
+    *   **Eng Follow-up**: Check outcome of Kinesis/SQS discussion.
+    *   **JIRA**: Create ticket for Vyom team with exact field specs for direct Data Lake feed.
+    *   **Backfill**: Plan to push historical missing data to the new stream to union with legacy Scoretool data.
 *   [ ] **Admission Forms Sync**: Chase DevOps for a fix ASAP (Critical DMS failure).
 
 ## 🏗️ Strategic Projects (The Big Rocks)
