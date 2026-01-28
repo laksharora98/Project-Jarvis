@@ -1,71 +1,56 @@
 # Global Task List & Backlog
 
-This file serves as the central hub for task management, prioritization, and tracking for Project Jarvis.
+*Last Updated: Jan 28, 2026*
 
-## ## Today's Roadmap (Jan 20)
+## 🚨 IMMEDIATE ACTIONS (Jan 28 - Before Leaving)
+*   [ ] **[Logistics]** **Apply for Leave**: Jan 29-30 (Reason: Wedding).
+*   [ ] **[Logistics]** **Office Exit**: Leave by 6:30 PM. Train departs H. Nizamuddin @ 10:50 PM.
+*   [ ] **[Handoff]** **Intern Task**: Ensure clear backlog/instructions for your absence (Wed-Mon) regarding QuickSight User Management (PSERP).
+*   [ ] **[Handoff]** **Hackathon**: Share your existing Battleground code with the team for the Jan 30-31 Internal Hackathon.
+*   [ ] **[Work]** **Hotfix**: Vyom <> Scoretool Data Sync (Stop the bleeding immediately).
 
-### 1. ✅ Done
-*   [x] **[Work]** Process Inbox
-*   [x] **[Work]** UAT and Release: PSERP Course Dump Report
-*   [x] **[Work]** Get updates: Webengage Data Validation & Hint Verification
+## 🔥 High Priority Fires (Data Sync Issues)
+*   [ ] **Superleap Connectors**: Get ETA from Superleap team (failing for ~3 days). Update Business stakeholders.
+*   [ ] **Vyom <> Scoretool**: Plan re-architecture (Fetch Source 2 data directly from Source 1).
+*   [ ] **Admission Forms Sync**: Chase DevOps for a fix ASAP (Critical DMS failure).
 
-### 2. 🔥 Active Priority Queue
-1.  [ ] **[Work]** UAT and Release: Outstanding Report
-2.  [ ] **[Work]** Stock Report: Minor enhancements
-3.  [ ] **[Work]** Data gathering related to tests
-4.  **[Admin]** Wedding Tasks
-    *   [ ] File tickets in Google Drive
-    *   [ ] Update Google Calendar with trip details
-    *   [ ] Apply for leave on HR Portal
-5.  [ ] **[Work]** PSERP Shutdown: Complete Planning & Schedule Meetings
-6.  [ ] **[Work]** Data Lake 2.0: Finalize PRD & Groom significant portion
-7.  [ ] **[Work]** CDP: Define Identity Resolution & Silver Schema (Verify PDF logic first!)
+## 🏗️ Strategic Projects (The Big Rocks)
+### 1. CDP Project (Customer Data Platform)
+*   **Context**: Significantly delayed. High priority.
+*   [ ] **Immediate**: Finalize PRD and send "Business Approval" email.
+*   [ ] **Next**: Plan grooming for early Feb & deployment phases.
 
-## ## Deprioritized / Postponed (For Later)
-*   [ ] **[Health]** Pick up PNS CT Scan report & Schedule ENT follow-up
-*   [ ] **[Admin]** Submit Investment Proofs (Deadline: Jan 26)
-*   [ ] **[Finance]** Unlock SBI Account
-*   [ ] **[Relationships]** Respond to intimate email from colleague
-*   [ ] **[Relationships]** Reach out to friends
+### 2. Data Lake 2.0 (Foundational Architecture)
+*   **Goal**: Enforce "Write once, reuse everywhere" (Silver Layer).
+*   [ ] **Action**: Ensure all new projects use the governed Silver Layer.
 
-## ## Backlog (Categorized)
+### 3. PSERP Shutdown (Migration)
+*   **Immediate**: Create master tracking sheet (Product KT, Backend KT, Silver Layer, Dev, Prod).
+*   [ ] **Action**: Plan KT meetings with stakeholders.
+*   [ ] **Action**: Email Analytics Head to list "most used datasets" to prioritize.
 
-### Professional
-#### Aakash
-**Project: PSERP Shutdown (Deadline: March 31)**
-*   [ ] Get KT on Finance modules (migrated vs. unmigrated)
-*   [ ] Understand backend schema with Engineering
-*   [ ] Identify most used datasets powered by Old ERP (Analytics team)
-*   [ ] Design Intermediate Silver Layer (Fact/Dim) using Phoenix
-*   [ ] Plan Dataset creation/replacement strategy
-*   [ ] Oversee Quicksight User Management migration (Owner: Intern)
+## 🛠️ Operational & Maintenance
+*   [ ] **Outstanding Report**: Ask team/intern to check for discrepancies (Old vs New) for UAT & Deploy.
+*   [ ] **Payment Bucket**: Create JIRA ticket for data discrepancy fix.
+*   [ ] **Phase Data Check**: Run specific check for Nabin Sir and update via email.
+*   [ ] **PSERP Course Dump**: Create JIRA ticket for report enhancement.
+*   [ ] **Webengage**: Get status update on validation + update regarding open query.
 
-**Project: Customer Data Platform (CDP)**
-*   [ ] Groom Phase 1 with Engineering (Post-PRD approval)
-*   [ ] Product Connect: Update CTO on PRD status (Target: Jan 22)
+## 📥 Personal & Backlog (Preserved from Previous)
+### Health & Lifestyle
+*   [ ] **Pick up PNS CT Scan report** & Schedule ENT follow-up
+*   [ ] Dental Appointment
+*   [ ] Establish Sleep/Wake routine
 
-**Project: Data Lake 2.0 (Medallion Architecture)**
-*   [ ] Migrate existing datasets/pipelines to new architecture
-
-**Career Development**
-*   [ ] Create comprehensive Upskilling Plan (Tech + Product)
-*   [ ] Create "Startup/Wealth" roadmap
-
-### Personal
-#### Relationships (The Dossier)
-*   [ ] **[Wedding Feb]** Start planning for February wedding
-*   [ ] Create "Dossier" structure (Contacts, Last Contacted, Notes)
-*   [ ] Schedule weekly social media review (Insta, Whatsapp, LinkedIn)
-*   [ ] Plan offline meetups
-
-#### Finance
+### Finance
+*   [ ] **Unlock SBI Account** (High Priority Recovery)
 *   [ ] Plan Budget, Investments, Insurance, Taxes
 
-#### Health & Lifestyle
-*   [ ] Clean Air Purifier filter
-*   [ ] Clean RO Water Purifier external sediment filter
-*   [ ] Sort unironed clothes pile / Living space organization
-*   [ ] Check parents' names in voting list
-*   [ ] Dental Appointment (Target: Feb)
-*   [ ] Establish Sleep/Wake routine
-*   [ ] Update Car documents
+### Relationships
+*   [ ] Respond to intimate email from colleague
+*   [ ] Reach out to friends (School/College)
+*   [ ] **Wedding Feb**: Start planning for the next wedding.
+
+### Career
+*   [ ] Create comprehensive Upskilling Plan (Tech + Product)
+*   [ ] Create "Startup/Wealth" roadmap
