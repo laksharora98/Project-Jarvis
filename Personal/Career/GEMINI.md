@@ -5,6 +5,11 @@ This directory is dedicated to professional growth, upskilling, and wealth creat
 ## Core Objective
 To build a robust skill set (Technical + Product) that enables either a high-paying job switch or the founding of a tech startup.
 
+## Long-Term Vision (The "Polymath" Dream)
+*   **Goal**: Become a Polymath versed in Advanced Sciences, Social Sciences, Economics, and Engineering.
+*   **Purpose**: To contribute significantly to scientific research and Indian Governance.
+*   **Barrier**: Currently wasting time, coasting, and daydreaming without action.
+
 ## Strategic Goals
 1.  **Upskilling**: Create and execute a learning plan (Data Science, Product Management, Engineering).
 2.  **Wealth**: Explore paths to rapid wealth accumulation (Salary jumps vs. Startup).

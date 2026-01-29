@@ -14,10 +14,13 @@ Your primary role is to act as a proactive knowledge manager. When we discuss an
 ## Active Projects (High Priority)
 *   **[Aakash Battleground](./Aakash%20Battleground/GEMINI.md) (Hackathon)**: A competitive, topic-wise quiz battleground prototype with real-time 1v1 battles.
 *   **[PSERP Shutdown](./PSERP%20Shutdown/GEMINI.md) (Critical)**: Migration of Finance modules and Analytics datasets from Old ERP (PeopleSoft) to New ERP (Phoenix) by March 31.
-*   **Customer Data Platform (CDP)**: Developing Phase 1 PRD and roadmap for the new CDP (with Quantiphi on GCP).
-*   **[Data Lake 2.0](./Data%20Lake%202.0/GEMINI.md)**: Implementation of Medallion Architecture for the data platform.
-*   **Stock Report**: Ongoing maintenance and refactoring of stock issuance reporting.
-*   **Faculty Scorecard**: Building a comprehensive leaderboard for faculty performance and engagement.
+*   **[Customer Data Platform (CDP)](./Customer%20Data%20Platform/GEMINI.md) (CRITICAL)**: Phase 1 PRD delayed. Manager relationship strained. **Monday Showdown Imminent.**
+*   **[Data Lake 2.0](./Data%20Lake%202.0/GEMINI.md)**: Implementation of Medallion Architecture.
+
+## Current Operational Crisis
+*   **The "Shadow Engineer" Trap**: You are personally coding fixes/deployments instead of raising tickets. This creates a dependency on you and prevents you from doing high-value PM work (PRDs, Strategy).
+*   **Data Lake "Wild West"**: No environments (Dev/Stage/Prod), direct table editing, hardcoded logic, repeated code, and no governance. The "Data Lake 2.0" project is the fix for this, but current BAU is drowning you.
+*   **Immediate Threat**: Meeting with Manager on Monday regarding missed CDP deadlines and overall performance.
 
 ## Other Projects
 -   **Concept Kundali**: Analyzing student performance at a concept level.

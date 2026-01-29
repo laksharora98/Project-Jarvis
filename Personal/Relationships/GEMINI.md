@@ -5,10 +5,15 @@ This directory serves as a "CRM" for personal and professional relationships. It
 ## Core Objective
 To combat isolation and proactively maintain a healthy social network by tracking details, last contact dates, and future plans for friends, family, and colleagues.
 
+## Current Challenges
+*   **Isolation**: Rarely reaching out to friends or extended family.
+*   **Envy/Shame**: Avoiding social media (Insta/LinkedIn) because of feeling "behind" in life.
+*   **Dating**: Fear of intimacy due to current mental/physical state ("Burning House" theory).
+
 ## Current Focus
 *   **Immediate**: Coordinate travel for the wedding in Ashoknagar (Jan 29-30).
-*   **Urgent**: Reconnect with close friends and respond to the intimate email from a colleague.
-*   **Build**: Establish the "Dossier" structure (Contacts, Notes, Frequency).
+*   **Urgent**: **Build the "Dossier"**. This is critical to stop losing friends. Jot down details and schedule reach-outs.
+*   **Action**: Respond to the intimate email from the colleague.
 
 ## Key Groups
 *   **School Friends**: Reconnect.
